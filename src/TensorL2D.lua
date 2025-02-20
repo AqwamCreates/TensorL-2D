@@ -815,13 +815,13 @@ function AqwamTensorLibrary:mean(tensor, dimension)
 
 	if (dimension ~= 1) and (dimension ~= 2) then error("Invalid dimension.") end
 
-	local dimensionSizeArray = AqwamTensorLibrary:getDimensionSizeArraydimensionSizeArray(tensor)
+	local dimensionSizeArray = AqwamTensorLibrary:getDimensionSizeArray(tensor)
 	
 	local size = dimensionSizeArray[dimension]
 	
 	local sumTensor = AqwamTensorLibrary:sum(tensor, dimension)
 	
-	local meanTensor = AqwamTensorLibrary:divide(columnSum, size)
+	local meanTensor = AqwamTensorLibrary:divide(sumTensor, size)
 
 	return meanTensor
 
@@ -863,7 +863,7 @@ function AqwamTensorLibrary:standardDeviation(tensor, dimension)
 	
 	if (dimension ~= 1) and (dimension ~= 2) then error("Invalid dimension.") end
 	
-	local dimensionSizeArray = AqwamTensorLibrary:getDimensionSizeArraydimensionSizeArray(tensor)
+	local dimensionSizeArray = AqwamTensorLibrary:getDimensionSizeArray(tensor)
 	
 	local size = dimensionSizeArray[dimension]
 
@@ -1582,7 +1582,7 @@ function AqwamTensorLibrary:copy(tensor)
 
 	local numberOfColumns = #tensor[1]
 
-	local result = AqwamTensorLibrary:createTensor(numberOfRows, numberOfColumns)
+	local result = AqwamTensorLibrary:createTensor({numberOfRows, numberOfColumns})
 
 	for row = 1, numberOfRows, 1 do
 
