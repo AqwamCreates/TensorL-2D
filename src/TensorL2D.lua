@@ -736,7 +736,7 @@ local function rowSum(tensor)
 	local numberOfRows = #tensor
 	local numberOfColumns = #tensor[1]
 
-	local result = AqwamTensorLibrary:createTensor(1, numberOfColumns)
+	local result = AqwamTensorLibrary:createTensor({1, numberOfColumns})
 
 	for row = 1, numberOfRows, 1 do
 
@@ -757,7 +757,7 @@ local function columnSum(tensor)
 	local numberOfRows = #tensor
 	local numberOfColumns = #tensor[1]
 
-	local result = AqwamTensorLibrary:createTensor(numberOfRows, 1)
+	local result = AqwamTensorLibrary:createTensor({numberOfRows, 1})
 
 	for row = 1, numberOfRows, 1 do
 
