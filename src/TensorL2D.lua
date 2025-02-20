@@ -622,15 +622,41 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 
 	local result = {}
 
-	for row = 1, numberOfRows, 1 do
+	if (minimumValue) and (not maximumValue) then
 
-		result[row] = {}
+		for row = 1, numberOfRows, 1 do
 
-		for column = 1, numberOfColumns, 1 do
+			result[row] = {}
 
-			result[row][column] = math.random(minimumValue, maximumValue)
+			for column = 1, numberOfColumns, 1 do
 
-		end	
+				result[row][column] = math.random(minimumValue)
+
+			end	
+
+		end
+
+	elseif (not minimumValue) and (not maximumValue) then
+
+		for row = 1, numberOfRows, 1 do
+
+			result[row] = {}
+
+			for column = 1, numberOfColumns, 1 do
+
+				result[row][column] = math.random()
+
+			end	
+
+		end
+
+	elseif (not minimumValue) and (maximumValue) then
+
+		error("Invalid minimum value.")
+
+	else
+
+		error("An unknown error has occured when creating the random uniform tensor.")
 
 	end
 
@@ -666,7 +692,7 @@ function AqwamTensorLibrary:transpose(tensor)
 	local numberOfRows = #tensor
 	local numberOfColumns = #tensor[1]
 
-	local result = AqwamTensorLibrary:createTensor(numberOfColumns, numberOfRows)
+	local result = AqwamTensorLibrary:createTensor({numberOfColumns, numberOfRows})
 
 	for row = 1, numberOfRows, 1 do
 
@@ -1284,19 +1310,53 @@ function AqwamTensorLibrary:applyFunction(functionToApply, ...)
 	local tensorArray = {...}
 
 	local numberOfTensors = #tensorArray
+	
+	local doAllTensorsHaveTheSameDimensionSizeArray
 
-	for i = 1, (numberOfTensors - 1), 1 do
+	--[[
+		
+		A single sweep is not enough to make sure that all tensors have the same dimension size arrays. So, we need to do it multiple times.
+		
+		Here's an example where the tensors' dimension size array will not match the others in a single sweep: {2, 3, 1}, {1,3}, {5, 1, 1, 1}. 
+		
+		The first dimension size array needs to match with the third dimension size array, but can only look at the second dimension size array. 
+		
+		So, we need to propagate the third dimension size array to the nearby dimension size array so that it reaches the first dimension size array. 
+		
+		In this case, it would be the second dimension size array.
+		
+	--]]
 
-		tensorArray[i], tensorArray[i + 1] = AqwamTensorLibrary:broadcast(tensorArray[i], tensorArray[i + 1])
+	repeat 
 
-	end
+		doAllTensorsHaveTheSameDimensionSizeArray = true
 
+		for i = 1, (#tensorArray - 1), 1 do
+
+			local tensor1 = tensorArray[i]
+
+			local tensor2 = tensorArray[i + 1]
+
+			local dimensionSizeArray1 = AqwamTensorLibrary:getDimensionSizeArray(tensor1)
+
+			local dimensionSizeArray2 = AqwamTensorLibrary:getDimensionSizeArray(tensor2)
+
+			if ((dimensionSizeArray1[1] ~= dimensionSizeArray2[1]) or (dimensionSizeArray1[2] ~= dimensionSizeArray2[2])) then doAllTensorsHaveTheSameDimensionSizeArray = false end
+
+			tensorArray[i], tensorArray[i + 1] = broadcast(tensor1, tensor2, false)
+
+		end
+
+	until (doAllTensorsHaveTheSameDimensionSizeArray)
+	
 	local tensor = tensorArray[1]
+	
+	local dimensionSizeArray = AqwamTensorLibrary:getDimensionSizeArray(tensor)
+	
+	local numberOfRows = dimensionSizeArray[1]
+	local numberOfColumns = dimensionSizeArray[2]
 
-	local numberOfRows = #tensor
-	local numberOfColumns = #tensor[1]
-
-	local result = AqwamTensorLibrary:createTensor(numberOfRows, numberOfColumns, true)
+	local result = AqwamTensorLibrary:createTensor(dimensionSizeArray, true)
 
 	local tensorValueArray = {}
 
