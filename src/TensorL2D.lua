@@ -557,7 +557,9 @@ function AqwamTensorLibrary:createIdentityTensor(dimensionSizeArray)
 
 	local numberOfColumns = dimensionSizeArray[2]
 
-	local result = table.create(numberOfRows, table.create(numberOfColumns, 0))
+	local result = {}
+
+	for row = 1, numberOfRows, 1 do result[row] = table.create(numberOfColumns, 0) end
 
 	for row = 1, numberOfRows, 1 do result[row][row] = 1 end
 
@@ -573,7 +575,9 @@ function AqwamTensorLibrary:createTensor(dimensionSizeArray, allValues)
 	
 	allValues = allValues or 0
 
-	local result = table.create(numberOfRows, table.create(numberOfColumns, allValues))
+	local result = {}
+	
+	for row = 1, numberOfRows, 1 do result[row] = table.create(numberOfColumns, allValues) end
 
 	return result
 
@@ -1380,15 +1384,13 @@ function AqwamTensorLibrary:findMaximumValue(tensor)
 
 	local tensorIndex
 
-	local currentValue
-
 	local maximumValue = -math.huge
 
 	for row = 1, #tensor, 1 do
 
 		for column = 1, #tensor[1], 1 do
 
-			currentValue = math.max(currentValue, tensor[row][column])
+			maximumValue = math.max(maximumValue, tensor[row][column])
 
 		end
 
@@ -1432,15 +1434,13 @@ function AqwamTensorLibrary:findMinimumValue(tensor)
 
 	local tensorIndex
 
-	local currentValue
-
 	local minimumValue = math.huge
 
 	for row = 1, #tensor, 1 do
 
 		for column = 1, #tensor[1], 1 do
 
-			currentValue = math.min(currentValue, tensor[row][column])
+			minimumValue = math.min(minimumValue, tensor[row][column])
 
 		end
 
