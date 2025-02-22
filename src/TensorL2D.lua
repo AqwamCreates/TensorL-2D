@@ -625,8 +625,22 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 	local numberOfColumns = dimensionSizeArray[2]
 
 	local result = {}
+	
+	if (minimumValue) and (maximumValue) then
+		
+		for row = 1, numberOfRows, 1 do
 
-	if (minimumValue) and (not maximumValue) then
+			result[row] = {}
+
+			for column = 1, numberOfColumns, 1 do
+
+				result[row][column] = math.random(minimumValue, maximumValue)
+
+			end
+
+		end
+
+	elseif (minimumValue) and (not maximumValue) then
 
 		for row = 1, numberOfRows, 1 do
 
