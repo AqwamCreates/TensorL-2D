@@ -628,19 +628,23 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 	
 	if (minimumValue) and (maximumValue) then
 		
+		if (minimumValue >= maximumValue) then error("The minimum value cannot exceed the maximum value.") end
+		
 		for row = 1, numberOfRows, 1 do
 
 			result[row] = {}
 
 			for column = 1, numberOfColumns, 1 do
 
-				result[row][column] = math.random(minimumValue, maximumValue)
+				result[row][column] = minimumValue + (math.random() * (maximumValue - minimumValue))
 
 			end
 
 		end
-
-	elseif (minimumValue) and (not maximumValue) then
+		
+	elseif (not minimumValue) and (maximumValue) then
+		
+		if (maximumValue <= 0) then error("The maximum value cannot be less than or equal to zero.") end
 
 		for row = 1, numberOfRows, 1 do
 
@@ -648,12 +652,28 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 
 			for column = 1, numberOfColumns, 1 do
 
-				result[row][column] = math.random(minimumValue)
+				result[row][column] = math.random() * maximumValue
 
 			end	
 
 		end
 
+	elseif (minimumValue) and (not maximumValue) then
+		
+		if (minimumValue >= 0) then error("The minimum value cannot be greater than or equal to zero.") end
+
+		for row = 1, numberOfRows, 1 do
+
+			result[row] = {}
+
+			for column = 1, numberOfColumns, 1 do
+
+				result[row][column] = math.random() * minimumValue
+
+			end	
+
+		end
+		
 	elseif (not minimumValue) and (not maximumValue) then
 
 		for row = 1, numberOfRows, 1 do
@@ -662,19 +682,11 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 
 			for column = 1, numberOfColumns, 1 do
 
-				result[row][column] = math.random()
+				result[row][column] = (math.random() * 2 - 1)
 
 			end	
 
 		end
-
-	elseif (not minimumValue) and (maximumValue) then
-
-		error("Invalid minimum value.")
-
-	else
-
-		error("An unknown error has occured when creating the random uniform tensor.")
 
 	end
 
