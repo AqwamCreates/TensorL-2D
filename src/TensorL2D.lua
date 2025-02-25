@@ -630,13 +630,15 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 		
 		if (minimumValue >= maximumValue) then error("The minimum value cannot exceed the maximum value.") end
 		
+		local rangeValue = maximumValue - minimumValue
+		
 		for row = 1, numberOfRows, 1 do
 
 			result[row] = {}
 
 			for column = 1, numberOfColumns, 1 do
 
-				result[row][column] = minimumValue + (math.random() * (maximumValue - minimumValue))
+				result[row][column] = minimumValue + (math.random() * rangeValue)
 
 			end
 
