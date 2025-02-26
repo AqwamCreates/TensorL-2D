@@ -142,7 +142,7 @@ function AqwamTensorLibrary:expand(tensor, targetRowSize, targetColumnSize)
 
 	local isTensorColumnSizeEqualToOne = (#tensor[1] == 1)
 
-	if (isTensorRowSizeEqualToOne == true) and (isTensorColumnSizeEqualToOne == false) then
+	if (isTensorRowSizeEqualToOne) and (not isTensorColumnSizeEqualToOne) then
 
 		for row = 1, targetRowSize, 1 do
 
@@ -152,7 +152,7 @@ function AqwamTensorLibrary:expand(tensor, targetRowSize, targetColumnSize)
 
 		end
 
-	elseif (isTensorRowSizeEqualToOne == false) and (isTensorColumnSizeEqualToOne == true) then
+	elseif (not isTensorRowSizeEqualToOne) and (isTensorColumnSizeEqualToOne) then
 
 		for row = 1, targetRowSize, 1 do
 
@@ -162,7 +162,7 @@ function AqwamTensorLibrary:expand(tensor, targetRowSize, targetColumnSize)
 
 		end
 
-	elseif (isTensorRowSizeEqualToOne == true) and (isTensorColumnSizeEqualToOne == true) then
+	elseif (isTensorRowSizeEqualToOne) and (isTensorColumnSizeEqualToOne) then
 
 		for row = 1, targetRowSize, 1 do
 
@@ -684,7 +684,7 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 
 			for column = 1, numberOfColumns, 1 do
 
-				result[row][column] = (math.random() * 2 - 1)
+				result[row][column] = (math.random() * 2) - 1
 
 			end	
 
