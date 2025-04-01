@@ -1728,19 +1728,19 @@ function AqwamTensorLibrary:inverse(tensor)
 
 		end
 
-		local inverse = AqwamTensorLibrary:transpose(adjugate)
+		local inverseTensor = AqwamTensorLibrary:transpose(adjugate)
 
 		for i = 1, dimensionSize do
 
 			for j = 1, dimensionSize do
 
-				inverse[i][j] = inverse[i][j] / determinant
+				inverseTensor[i][j] = inverseTensor[i][j] / determinant
 
 			end
 
 		end
 
-		return inverse
+		return inverseTensor
 
 	end
 
