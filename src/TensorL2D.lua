@@ -1834,4 +1834,52 @@ function AqwamTensorLibrary:getValue(tensor, dimensionIndexArray)
 
 end
 
+function AqwamTensorLibrary:flip(tensor, dimension)
+	
+	local dimensionSizeArray = AqwamTensorLibrary:getDimensionSizeArray(tensor)
+	
+	local numberOfRows = dimensionSizeArray[1]
+	
+	local numberOfColumns = dimensionSizeArray[2]
+	
+	local resultTensor = {}
+	
+	if (dimension == 1) then
+		
+		for i = 1, numberOfRows, 1 do
+			
+			resultTensor[i] = {}
+			
+			for j = 1, numberOfColumns, 1 do
+				
+				resultTensor[i][j] = tensor[(numberOfRows - i) + 1][j]
+				
+			end
+			
+		end
+		
+	elseif (dimension == 2) then
+		
+		for i = 1, numberOfRows, 1 do
+
+			resultTensor[i] = {}
+			
+			for j = 1, numberOfColumns, 1 do
+				
+				resultTensor[i][j] = tensor[i][(numberOfColumns - j) + 1]
+				
+			end
+
+		end
+		
+	else
+		
+		error("Invalid dimension.")
+		
+	end
+
+	return resultTensor
+	
+end
+
 return AqwamTensorLibrary
