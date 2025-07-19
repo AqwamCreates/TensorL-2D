@@ -1391,6 +1391,8 @@ function AqwamTensorLibrary:applyFunction(functionToApply, ...)
 	
 	local dimensionSizeArray = AqwamTensorLibrary:getDimensionSizeArray(tensor)
 	
+	if (#dimensionSizeArray == 0) then return functionToApply(table.unpack(tensorArray)) end
+	
 	local numberOfRows = dimensionSizeArray[1]
 	local numberOfColumns = dimensionSizeArray[2]
 
