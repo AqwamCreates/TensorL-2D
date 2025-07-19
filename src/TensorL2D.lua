@@ -806,6 +806,8 @@ local function columnSum(tensor)
 end
 
 function AqwamTensorLibrary:sum(tensor, dimension)
+	
+	if (type(tensor) == "number") then return tensor end
 
 	if (not dimension) then 
 
@@ -842,6 +844,8 @@ local function calculateMean(tensor)
 end
 
 function AqwamTensorLibrary:mean(tensor, dimension)
+	
+	if (type(tensor) == "number") then return tensor end
 
 	if (not dimension) then return calculateMean(tensor) end
 
@@ -890,6 +894,8 @@ local function calculateStandardDeviation(tensor)
 end
 
 function AqwamTensorLibrary:standardDeviation(tensor, dimension)
+	
+	if (type(tensor) == "number") then return 0 end
 
 	if (not dimension) then return calculateStandardDeviation(tensor) end
 	
