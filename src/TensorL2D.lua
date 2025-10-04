@@ -295,15 +295,19 @@ local function applyFunctionUsingOneTensor(functionToApply, tensor)
 
 	local result = {}
 
-	for row = 1, #tensor, 1 do
+	local resultColumnVector
 
-		result[row] = {}
+	for row, columnVector in ipairs(tensor) do
 
-		for column = 1, #tensor[1], 1 do
+		resultColumnVector = {}
 
-			result[row][column] = functionToApply(tensor[row][column])
+		for column, value in ipairs(columnVector) do
+
+			resultColumnVector[column] = functionToApply(value)
 
 		end
+
+		result[row] = resultColumnVector
 
 	end
 
@@ -317,15 +321,23 @@ local function applyFunctionUsingTwoTensors(functionToApply, tensor1, tensor2)
 
 	local result = {}
 
-	for row = 1, #tensor1, 1 do
+	local resultColumnVector
+	
+	local columnVector2
 
-		result[row] = {}
+	for row, columnVector1 in ipairs(tensor1) do
+		
+		columnVector2 = tensor2[row]
 
-		for column = 1, #tensor1[1], 1 do
+		resultColumnVector = {}
+		
+		for column, value in ipairs(columnVector1) do
 
-			result[row][column] = functionToApply(tensor1[row][column], tensor2[row][column])
+			resultColumnVector[column] = functionToApply(value, columnVector2[column])
 
 		end
+
+		result[row] = resultColumnVector
 
 	end
 
@@ -336,17 +348,21 @@ end
 local function applyFunctionWhenTheFirstValueIsAScalar(functionToApply, scalar, tensor)
 
 	local result = {}
-
-	for row = 1, #tensor, 1 do
-
-		result[row] = {}
-
-		for column = 1, #tensor[1], 1 do
-
-			result[row][column] = functionToApply(scalar, tensor[row][column])
-
+	
+	local resultColumnVector
+	
+	for row, columnVector in ipairs(tensor) do
+		
+		resultColumnVector = {}
+		
+		for column, value in ipairs(columnVector) do
+			
+			resultColumnVector[column] = functionToApply(scalar, value)
+			
 		end
-
+		
+		result[row] = resultColumnVector
+		
 	end
 
 	return result
@@ -357,15 +373,19 @@ local function applyFunctionWhenTheSecondValueIsAScalar(functionToApply, tensor,
 
 	local result = {}
 
-	for row = 1, #tensor, 1 do
+	local resultColumnVector
 
-		result[row] = {}
+	for row, columnVector in ipairs(tensor) do
 
-		for column = 1, #tensor[1], 1 do
+		resultColumnVector = {}
 
-			result[row][column] = functionToApply(tensor[row][column], scalar)
+		for column, value in ipairs(columnVector) do
+
+			resultColumnVector[column] = functionToApply(value, scalar)
 
 		end
+
+		result[row] = resultColumnVector
 
 	end
 
@@ -510,15 +530,15 @@ end
 function AqwamTensorLibrary:areTensorsEqual(...)
 
 	local resultTensor = applyFunctionUsingMultipleTensors(function(a, b) return a == b end, ...)
-
-	for row = 1, #resultTensor, 1 do
-
-		for column = 1, #resultTensor[1], 1 do
-
-			if (resultTensor[row][column] == false) then return false end
-
+	
+	for _, columnVector in ipairs(resultTensor) do
+		
+		for _, value in ipairs(columnVector) do
+			
+			if (not value) then return false end
+			
 		end
-
+		
 	end
 
 	return true
@@ -1418,15 +1438,13 @@ end
 
 function AqwamTensorLibrary:findMaximumValue(tensor)
 
-	local tensorIndex
-
 	local maximumValue = -math.huge
 
-	for row = 1, #tensor, 1 do
+	for _, columnVector in ipairs(tensor) do
 
-		for column = 1, #tensor[1], 1 do
+		for _, value in ipairs(columnVector) do
 
-			maximumValue = math.max(maximumValue, tensor[row][column])
+			maximumValue = math.max(maximumValue, value)
 
 		end
 
@@ -1444,15 +1462,13 @@ function AqwamTensorLibrary:findMaximumValueDimensionIndexArray(tensor)
 
 	local maximumValue = -math.huge
 
-	for row = 1, #tensor, 1 do
+	for row, columnVector in ipairs(tensor) do
 
-		for column = 1, #tensor[1], 1 do
+		for column, value in ipairs(columnVector) do
 
-			currentValue = tensor[row][column]
+			if (value > maximumValue) then
 
-			if (currentValue > maximumValue) then
-
-				maximumValue = currentValue
+				maximumValue = value
 
 				dimensionIndexArray = {row, column}
 
@@ -1468,15 +1484,13 @@ end
 
 function AqwamTensorLibrary:findMinimumValue(tensor)
 
-	local tensorIndex
-
 	local minimumValue = math.huge
 
-	for row = 1, #tensor, 1 do
+	for _, columnVector in ipairs(tensor) do
 
-		for column = 1, #tensor[1], 1 do
+		for _, value in ipairs(columnVector) do
 
-			minimumValue = math.min(minimumValue, tensor[row][column])
+			minimumValue = math.max(minimumValue, value)
 
 		end
 
@@ -1494,15 +1508,13 @@ function AqwamTensorLibrary:findMinimumValueDimensionIndexArray(tensor)
 
 	local minimumValue = math.huge
 
-	for row = 1, #tensor, 1 do
+	for row, columnVector in ipairs(tensor) do
 
-		for column = 1, #tensor[1], 1 do
+		for column, value in ipairs(columnVector) do
 
-			currentValue = tensor[row][column]
+			if (value < minimumValue) then
 
-			if (currentValue < minimumValue) then
-
-				minimumValue = currentValue
+				minimumValue = value
 
 				dimensionIndexArray = {row, column}
 
@@ -1538,8 +1550,6 @@ function AqwamTensorLibrary:extractRows(tensor, startingRowIndex, endingRowIndex
 
 	local numberOfRows = #tensor
 
-	local numberOfColumns = #tensor[1]
-
 	local result = {}
 
 	for row = startingRowIndex, endingRowIndex do
@@ -1561,8 +1571,6 @@ function AqwamTensorLibrary:extractColumns(tensor, startingColumnIndex, endingCo
 	if (endingColumnIndex <= 0) then error("The ending column index must be greater than 0.") end
 
 	local numberOfRows = #tensor
-
-	local numberOfColumns = #tensor[1]
 
 	local result = {}
 
@@ -1619,15 +1627,15 @@ function AqwamTensorLibrary:copy(tensor)
 	local numberOfColumns = #tensor[1]
 
 	local result = AqwamTensorLibrary:createTensor({numberOfRows, numberOfColumns})
-
-	for row = 1, numberOfRows, 1 do
-
-		for column = 1, numberOfColumns, 1 do
-
-			result[row][column] = tensor[row][column]
-
+	
+	for row, columnVector in ipairs(result) do
+		
+		for column, value in ipairs(columnVector) do
+			
+			result[row][column] = value
+			
 		end
-
+		
 	end
 
 	return result
