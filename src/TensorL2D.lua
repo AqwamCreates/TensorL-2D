@@ -529,17 +529,13 @@ function AqwamTensorLibrary:dotProduct(...)
 
 	local tensors = {...}
 
-	local numberOfTensors = #tensors
-
-	if (numberOfTensors == 1) then warn("Only one argument!") end
-
 	local result = tensors[1]
 	
 	local secondTensor
 
 	result = convertToTensorIfScalar(result)
 
-	for i = 2, numberOfTensors, 1 do
+	for i = 2, #tensors, 1 do
 
 		result = convertToTensorIfScalar(result)
 		
@@ -1359,7 +1355,7 @@ function AqwamTensorLibrary:applyFunction(functionToApply, ...)
 		
 		A single sweep is not enough to make sure that all tensors have the same dimension size arrays. So, we need to do it multiple times.
 		
-		Here's an example where the tensors' dimension size array will not match the others in a single sweep: {2, 3, 1}, {1,3}, {5, 1, 1, 1}. 
+		Here's an example where the tensors' dimension size array will not match the others in a single sweep: {2, 3, 1}, {1, 3}, {5, 1, 1, 1}. 
 		
 		The first dimension size array needs to match with the third dimension size array, but can only look at the second dimension size array. 
 		
