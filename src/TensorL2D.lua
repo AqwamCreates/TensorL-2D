@@ -534,14 +534,18 @@ function AqwamTensorLibrary:dotProduct(...)
 	if (numberOfTensors == 1) then warn("Only one argument!") end
 
 	local result = tensors[1]
+	
+	local secondTensor
 
 	result = convertToTensorIfScalar(result)
 
 	for i = 2, numberOfTensors, 1 do
 
 		result = convertToTensorIfScalar(result)
+		
+		secondTensor = convertToTensorIfScalar(tensors[i])
 
-		result = dotProduct(result, tensors[i])
+		result = dotProduct(result, secondTensor)
 
 	end
 
