@@ -1445,8 +1445,6 @@ function AqwamTensorLibrary:findMaximumValueDimensionIndexArray(tensor)
 
 	local dimensionIndexArray
 
-	local currentValue
-
 	local maximumValue = -math.huge
 
 	for row, rowVector in ipairs(tensor) do
@@ -1490,8 +1488,6 @@ end
 function AqwamTensorLibrary:findMinimumValueDimensionIndexArray(tensor)
 
 	local dimensionIndexArray
-
-	local currentValue
 
 	local minimumValue = math.huge
 
