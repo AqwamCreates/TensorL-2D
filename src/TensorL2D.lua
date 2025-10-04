@@ -1477,7 +1477,7 @@ function AqwamTensorLibrary:findMinimumValue(tensor)
 
 		for _, value in ipairs(rowVector) do
 
-			minimumValue = math.max(minimumValue, value)
+			minimumValue = math.min(minimumValue, value)
 
 		end
 
