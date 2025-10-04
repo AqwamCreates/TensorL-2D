@@ -295,19 +295,19 @@ local function applyFunctionUsingOneTensor(functionToApply, tensor)
 
 	local result = {}
 
-	local resultColumnVector
+	local resultrowVector
 
-	for row, columnVector in ipairs(tensor) do
+	for row, rowVector in ipairs(tensor) do
 
-		resultColumnVector = {}
+		resultrowVector = {}
 
-		for column, value in ipairs(columnVector) do
+		for column, value in ipairs(rowVector) do
 
-			resultColumnVector[column] = functionToApply(value)
+			resultrowVector[column] = functionToApply(value)
 
 		end
 
-		result[row] = resultColumnVector
+		result[row] = resultrowVector
 
 	end
 
@@ -321,23 +321,23 @@ local function applyFunctionUsingTwoTensors(functionToApply, tensor1, tensor2)
 
 	local result = {}
 
-	local resultColumnVector
+	local resultrowVector
 	
-	local columnVector2
+	local rowVector2
 
-	for row, columnVector1 in ipairs(tensor1) do
+	for row, rowVector1 in ipairs(tensor1) do
 		
-		columnVector2 = tensor2[row]
+		rowVector2 = tensor2[row]
 
-		resultColumnVector = {}
+		resultrowVector = {}
 		
-		for column, value in ipairs(columnVector1) do
+		for column, value in ipairs(rowVector1) do
 
-			resultColumnVector[column] = functionToApply(value, columnVector2[column])
+			resultrowVector[column] = functionToApply(value, rowVector2[column])
 
 		end
 
-		result[row] = resultColumnVector
+		result[row] = resultrowVector
 
 	end
 
@@ -349,19 +349,19 @@ local function applyFunctionWhenTheFirstValueIsAScalar(functionToApply, scalar, 
 
 	local result = {}
 	
-	local resultColumnVector
+	local resultrowVector
 	
-	for row, columnVector in ipairs(tensor) do
+	for row, rowVector in ipairs(tensor) do
 		
-		resultColumnVector = {}
+		resultrowVector = {}
 		
-		for column, value in ipairs(columnVector) do
+		for column, value in ipairs(rowVector) do
 			
-			resultColumnVector[column] = functionToApply(scalar, value)
+			resultrowVector[column] = functionToApply(scalar, value)
 			
 		end
 		
-		result[row] = resultColumnVector
+		result[row] = resultrowVector
 		
 	end
 
@@ -373,19 +373,19 @@ local function applyFunctionWhenTheSecondValueIsAScalar(functionToApply, tensor,
 
 	local result = {}
 
-	local resultColumnVector
+	local resultrowVector
 
-	for row, columnVector in ipairs(tensor) do
+	for row, rowVector in ipairs(tensor) do
 
-		resultColumnVector = {}
+		resultrowVector = {}
 
-		for column, value in ipairs(columnVector) do
+		for column, value in ipairs(rowVector) do
 
-			resultColumnVector[column] = functionToApply(value, scalar)
+			resultrowVector[column] = functionToApply(value, scalar)
 
 		end
 
-		result[row] = resultColumnVector
+		result[row] = resultrowVector
 
 	end
 
@@ -531,9 +531,9 @@ function AqwamTensorLibrary:areTensorsEqual(...)
 
 	local resultTensor = applyFunctionUsingMultipleTensors(function(a, b) return a == b end, ...)
 	
-	for _, columnVector in ipairs(resultTensor) do
+	for _, rowVector in ipairs(resultTensor) do
 		
-		for _, value in ipairs(columnVector) do
+		for _, value in ipairs(rowVector) do
 			
 			if (not value) then return false end
 			
@@ -739,20 +739,16 @@ end
 
 function AqwamTensorLibrary:transpose(tensor)
 
-	local currentRowVector
-
 	local numberOfRows = #tensor
 	local numberOfColumns = #tensor[1]
 
 	local result = AqwamTensorLibrary:createTensor({numberOfColumns, numberOfRows})
+	
+	for row, rowVector in ipairs(tensor) do
 
-	for row = 1, numberOfRows, 1 do
+		for column, value in ipairs(rowVector) do
 
-		currentRowVector = tensor[row]
-
-		for column = 1, #currentRowVector, 1 do
-
-			result[column][row] = currentRowVector[column]
+			result[column][row] = value
 
 		end
 
@@ -765,15 +761,12 @@ end
 local function sumFromAllDimensions(tensor)
 
 	local result = 0
+	
+	for _, rowVector in ipairs(tensor) do
 
-	local tensorRows = #tensor
-	local tensorColumns = #tensor[1]
+		for _, value in ipairs(rowVector) do
 
-	for row = 1, tensorRows, 1 do
-
-		for column = 1, tensorColumns, 1 do
-
-			result += tensor[row][column]
+			result = result + value
 
 		end
 
@@ -785,19 +778,18 @@ end
 
 local function rowSum(tensor)
 
-	local numberOfRows = #tensor
 	local numberOfColumns = #tensor[1]
 
 	local result = AqwamTensorLibrary:createTensor({1, numberOfColumns})
-
-	for row = 1, numberOfRows, 1 do
-
-		for column = 1, numberOfColumns, 1 do
-
-			result[1][column] += tensor[row][column]
-
-		end	
-
+	
+	for _, rowVector in ipairs(tensor) do
+		
+		for column, value in ipairs(rowVector) do
+			
+			result[1][column] = result[1][column] + value
+			
+		end
+		
 	end
 
 	return result
@@ -807,17 +799,16 @@ end
 local function columnSum(tensor)
 
 	local numberOfRows = #tensor
-	local numberOfColumns = #tensor[1]
 
 	local result = AqwamTensorLibrary:createTensor({numberOfRows, 1})
 
-	for row = 1, numberOfRows, 1 do
+	for row, rowVector in ipairs(tensor) do
 
-		for column = 1, numberOfColumns, 1 do
+		for _, value in ipairs(rowVector) do
 
-			result[row][1] += tensor[row][column]
+			result[row][1] = result[row][1] + value
 
-		end	
+		end
 
 	end
 
@@ -890,24 +881,20 @@ local function calculateStandardDeviation(tensor)
 	local numberOfElements = #tensor * #tensor[1]
 
 	local sum = 0
+	
+	for row, rowVector in ipairs(tensor) do
 
-	local variance
+		for column, value in ipairs(rowVector) do
 
-	local standardDeviation
-
-	for row = 1, #tensor, 1 do
-
-		for column = 1, #tensor[1], 1 do
-
-			sum += tensor[row][column] - mean
+			sum = sum + (value - mean)
 
 		end
 
 	end
 
-	variance = sum^2 / numberOfElements
+	local variance = (sum^2) / numberOfElements
 
-	standardDeviation = math.sqrt(variance)
+	local standardDeviation = math.sqrt(variance)
 
 	return standardDeviation, variance, mean
 
@@ -952,7 +939,7 @@ function AqwamTensorLibrary:generateTensorString(tensor)
 	local columnWidths = {}
 
 	-- Calculate maximum width for each column
-	for column = 1, numberOfColumns do
+	for column = 1, numberOfColumns, 1 do
 
 		local maxWidth = 0
 
@@ -974,11 +961,11 @@ function AqwamTensorLibrary:generateTensorString(tensor)
 
 	local text = ""
 
-	for row = 1, numberOfRows do
+	for row = 1, numberOfRows, 1 do
 
 		text = text .. "{"
 
-		for column = 1, numberOfColumns do
+		for column = 1, numberOfColumns, 1 do
 
 			local cellValue = tensor[row][column]
 
@@ -1031,11 +1018,11 @@ function AqwamTensorLibrary:generateTensorWithCommaString(tensor)
 	local columnWidths = {}
 
 	-- Calculate maximum width for each column
-	for column = 1, numberOfColumns do
+	for column = 1, numberOfColumns, 1 do
 
 		local maxWidth = 0
 
-		for row = 1, numberOfRows do
+		for row = 1, numberOfRows, 1 do
 
 			local cellWidth = string.len(tostring(tensor[row][column]))
 
@@ -1059,11 +1046,11 @@ function AqwamTensorLibrary:generateTensorWithCommaString(tensor)
 
 	local text = ""
 
-	for row = 1, numberOfRows do
+	for row = 1, numberOfRows, 1 do
 
 		text = text .. "{"
 
-		for column = 1, numberOfColumns do
+		for column = 1, numberOfColumns, 1 do
 
 			local cellValue = tensor[row][column]
 
@@ -1123,11 +1110,11 @@ function AqwamTensorLibrary:generatePortableTensorString(tensor)
 	local columnWidths = {}
 
 	-- Calculate maximum width for each column
-	for column = 1, numberOfColumns do
+	for column = 1, numberOfColumns, 1 do
 
 		local maxWidth = 0
 
-		for row = 1, numberOfRows do
+		for row = 1, numberOfRows, 1 do
 
 			local cellWidth = string.len(tostring(tensor[row][column]))
 
@@ -1151,11 +1138,11 @@ function AqwamTensorLibrary:generatePortableTensorString(tensor)
 
 	local text = "{\n"
 
-	for row = 1, numberOfRows do
+	for row = 1, numberOfRows, 1 do
 
 		text = text .. "\t{"
 
-		for column = 1, numberOfColumns do
+		for column = 1, numberOfColumns, 1 do
 
 			local cellValue = tensor[row][column]
 
@@ -1440,9 +1427,9 @@ function AqwamTensorLibrary:findMaximumValue(tensor)
 
 	local maximumValue = -math.huge
 
-	for _, columnVector in ipairs(tensor) do
+	for _, rowVector in ipairs(tensor) do
 
-		for _, value in ipairs(columnVector) do
+		for _, value in ipairs(rowVector) do
 
 			maximumValue = math.max(maximumValue, value)
 
@@ -1462,9 +1449,9 @@ function AqwamTensorLibrary:findMaximumValueDimensionIndexArray(tensor)
 
 	local maximumValue = -math.huge
 
-	for row, columnVector in ipairs(tensor) do
+	for row, rowVector in ipairs(tensor) do
 
-		for column, value in ipairs(columnVector) do
+		for column, value in ipairs(rowVector) do
 
 			if (value > maximumValue) then
 
@@ -1486,9 +1473,9 @@ function AqwamTensorLibrary:findMinimumValue(tensor)
 
 	local minimumValue = math.huge
 
-	for _, columnVector in ipairs(tensor) do
+	for _, rowVector in ipairs(tensor) do
 
-		for _, value in ipairs(columnVector) do
+		for _, value in ipairs(rowVector) do
 
 			minimumValue = math.max(minimumValue, value)
 
@@ -1508,9 +1495,9 @@ function AqwamTensorLibrary:findMinimumValueDimensionIndexArray(tensor)
 
 	local minimumValue = math.huge
 
-	for row, columnVector in ipairs(tensor) do
+	for row, rowVector in ipairs(tensor) do
 
-		for column, value in ipairs(columnVector) do
+		for column, value in ipairs(rowVector) do
 
 			if (value < minimumValue) then
 
@@ -1628,9 +1615,9 @@ function AqwamTensorLibrary:copy(tensor)
 
 	local result = AqwamTensorLibrary:createTensor({numberOfRows, numberOfColumns})
 	
-	for row, columnVector in ipairs(result) do
+	for row, rowVector in ipairs(result) do
 		
-		for column, value in ipairs(columnVector) do
+		for column, value in ipairs(rowVector) do
 			
 			result[row][column] = value
 			
