@@ -250,26 +250,28 @@ local function dotProduct(tensor1, tensor2)
 	local tensor1Row = #tensor1
 	local tensor1Column = #tensor1[1]
 	local tensor2Column = #tensor2[1]
-
-	local extractedTensor2Column
-	local multipliedRowVector
-	local calculatedVectorSum
+	
+	local tensor1Array
 
 	checkIfCanDotProduct(tensor1, tensor2)
 
 	for row = 1, tensor1Row, 1 do
-
-		result[row] = {}
+		
+		local resultArray = {}
+		
+		tensor1Array = tensor1[row]
 
 		for column = 1, tensor2Column, 1 do
 
 			local sum = 0
 
-			for i = 1, tensor1Column do sum = sum + (tensor1[row][i] * tensor2[i][column]) end
+			for i = 1, tensor1Column do sum = sum + (tensor1Array[i] * tensor2[i][column]) end
 
-			result[row][column] = sum
+			resultArray[column] = sum
 
 		end
+		
+		result[row] = resultArray
 
 	end
 
