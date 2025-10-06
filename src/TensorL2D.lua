@@ -1603,25 +1603,7 @@ end
 
 function AqwamTensorLibrary:copy(tensor)
 
-	if (type(tensor) ~= "table") then return tensor end
-
-	local numberOfRows = #tensor
-
-	local numberOfColumns = #tensor[1]
-
-	local result = AqwamTensorLibrary:createTensor({numberOfRows, numberOfColumns})
-	
-	for row, rowVector in ipairs(result) do
-		
-		for column, value in ipairs(rowVector) do
-			
-			result[row][column] = value
-			
-		end
-		
-	end
-
-	return result
+	return deepCopyTable(tensor)
 
 end
 
