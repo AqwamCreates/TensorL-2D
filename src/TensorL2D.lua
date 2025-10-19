@@ -275,9 +275,7 @@ local function dotProduct(tensor1, tensor2)
 
 	end
 
-	local isScalar = (#result == 1 and #result[1] == 1)
-
-	return (isScalar and result[1][1]) or result
+	return result
 
 end
 
