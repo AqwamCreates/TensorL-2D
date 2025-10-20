@@ -578,10 +578,18 @@ function AqwamTensorLibrary:createIdentityTensor(dimensionSizeArray)
 	local numberOfColumns = dimensionSizeArray[2]
 
 	local result = {}
+	
+	local array
 
-	for row = 1, numberOfRows, 1 do result[row] = table.create(numberOfColumns, 0) end
-
-	for row = 1, numberOfRows, 1 do result[row][row] = 1 end
+	for row = 1, numberOfRows, 1 do
+		
+		array = table.create(numberOfColumns, 0) 
+		
+		array[row] = 1 
+		
+		result[row] = array
+		
+	end
 
 	return result
 
