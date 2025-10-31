@@ -1431,22 +1431,60 @@ function AqwamTensorLibrary:applyFunction(functionToApply, ...)
 
 end
 
-function AqwamTensorLibrary:findMaximumValue(tensor)
+function AqwamTensorLibrary:findMaximumValue(tensor, dimension)
+	
+	if (not dimension) then
 
-	local maximumValue = -math.huge
+		local maximumValue = -math.huge
 
-	for _, rowVector in ipairs(tensor) do
-
-		for _, value in ipairs(rowVector) do
-
-			maximumValue = math.max(maximumValue, value)
-
+		for _, rowVector in ipairs(tensor) do
+			
+			for _, value in ipairs(rowVector) do
+				
+				maximumValue = math.max(maximumValue, value)
+				
+			end
+			
 		end
 
+		return maximumValue
+
+	elseif (dimension == 1) then
+
+		local numberOfColumns = #tensor[1]
+		
+		local maximumVector = {}
+
+		for j = 1, numberOfColumns do maximumVector[j] = -math.huge end
+
+		for _, rowVector in ipairs(tensor) do
+			
+			for j, value in ipairs(rowVector) do maximumVector[j] = math.max(maximumVector[j], value) end
+			
+		end
+
+		return {maximumVector}
+
+	elseif (dimension == 2) then
+
+		local maximumVector = {}
+
+		for _, rowVector in ipairs(tensor) do
+			
+			local rowMaximumValue = math.max(table.unpack(rowVector))
+			
+			table.insert(maximumVector, {rowMaximumValue})
+			
+		end
+
+		return maximumVector
+
+	else
+		
+		error("Invalid dimension. Expected 1 or 2.")
+		
 	end
-
-	return maximumValue
-
+	
 end
 
 function AqwamTensorLibrary:findMaximumValueDimensionIndexArray(tensor)
@@ -1475,21 +1513,59 @@ function AqwamTensorLibrary:findMaximumValueDimensionIndexArray(tensor)
 
 end
 
-function AqwamTensorLibrary:findMinimumValue(tensor)
+function AqwamTensorLibrary:findMinimumValue(tensor, dimension)
 
-	local minimumValue = math.huge
+	if (not dimension) then
 
-	for _, rowVector in ipairs(tensor) do
+		local minimumValue = math.huge
 
-		for _, value in ipairs(rowVector) do
+		for _, rowVector in ipairs(tensor) do
+			
+			for _, value in ipairs(rowVector) do
+				
+				minimumValue = math.min(minimumValue, value)
+				
+			end
+			
+		end
 
-			minimumValue = math.min(minimumValue, value)
+		return minimumValue
+
+	elseif (dimension == 1) then
+
+		local numberOfColumns = #tensor[1]
+
+		local minimumVector = {}
+
+		for j = 1, numberOfColumns do minimumVector[j] = math.huge end
+
+		for _, rowVector in ipairs(tensor) do
+
+			for j, value in ipairs(rowVector) do minimumVector[j] = math.min(minimumVector[j], value) end
 
 		end
 
-	end
+		return {minimumVector}
 
-	return minimumValue
+	elseif (dimension == 2) then
+
+		local minimumVector = {}
+
+		for _, rowVector in ipairs(tensor) do
+
+			local rowMinimumValue = math.min(table.unpack(rowVector))
+
+			table.insert(minimumVector, {rowMinimumValue})
+
+		end
+
+		return minimumVector
+
+	else
+
+		error("Invalid dimension. Expected 1 or 2.")
+
+	end
 
 end
 
