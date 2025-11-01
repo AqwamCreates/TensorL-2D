@@ -569,7 +569,7 @@ function AqwamTensorLibrary:dotProduct(...)
 
 end
 
-function AqwamTensorLibrary:createIdentityTensor(dimensionSizeArray)
+function AqwamTensorLibrary:createIdentityTensor(dimensionSizeArray, value)
 
 	if (#dimensionSizeArray ~= 2) then error("Invalid dimension size array.") end
 
@@ -580,12 +580,14 @@ function AqwamTensorLibrary:createIdentityTensor(dimensionSizeArray)
 	local result = {}
 	
 	local array
+	
+	value = value or 1
 
 	for row = 1, numberOfRows, 1 do
 		
 		array = table.create(numberOfColumns, 0) 
 		
-		array[row] = 1 
+		array[row] = value
 		
 		result[row] = array
 		
