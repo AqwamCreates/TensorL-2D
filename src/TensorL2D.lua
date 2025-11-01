@@ -856,9 +856,17 @@ local function calculateMean(tensor)
 
 	local numberOfElements = #tensor * #tensor[1]
 
-	local sum = sum(tensor)
+	for _, unwrappedRowVector in ipairs(tensor) do
+		
+		for _, value in ipairs(unwrappedRowVector) do
+			
+			sum = sum + value
+			
+		end
+		
+	end
 
-	local mean = sum/numberOfElements
+	local mean = sum / numberOfElements
 
 	return mean
 
