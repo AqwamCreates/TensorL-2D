@@ -904,13 +904,13 @@ local function calculateStandardDeviation(tensor)
 
 		for column, value in ipairs(rowVector) do
 
-			sum = sum + (value - mean)
+			sum = sum + math.pow((value - mean), 2)
 
 		end
 
 	end
 
-	local variance = (sum^2) / numberOfElements
+	local variance = sum / numberOfElements
 
 	local standardDeviation = math.sqrt(variance)
 
