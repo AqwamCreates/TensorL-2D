@@ -125,7 +125,7 @@ The User acknowledges and agrees that, in the event Licensor suspects a violatio
 
 ## In Relation Of User's Third Parties
 
-The User acknowledges that if the Library is used or possesed by the User's Third Parties, the User would be liable for User's Third Parties use and possesion.
+The User acknowledges that if the Library is used or possesed by the User's Third Parties, the User would be liable for User's Third Parties' use and possesion of the Library.
 
 ## Governing Law
 
