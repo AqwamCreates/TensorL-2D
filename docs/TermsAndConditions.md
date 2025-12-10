@@ -115,7 +115,11 @@ The determination of compensatory damages shall be made by a court of competent 
 
 ## Waiver of Confidentiality Rights
 
-User acknowledges and agrees that, in the event Licensor suspects a violation of this Agreement, particularly in cases where the Library is commercially used without conforming to the commercial use conditions, the User hereby waives all rights to keep the codes that uses the Library confidential. This waiver includes but is not limited to any obligation to maintain confidentiality regarding the Library and its usage, even in relation to the User's third parties. In such instances, the User shall not assert any right to confidentiality with respect to the Library, and the User shall fully cooperate with Licensor in any legal proceedings, including the revelation of the code without prior notice. This provision is essential to protect the intellectual property and commercial interests of the Licensor. Should the User's third parties possesses or uses the library without valid commercial agreement with the Licensor, they shall be held liable as well regardless if the User's third parties are aware of it or not. Only the monetary forms of compensation will be accepted.
+The User acknowledges and agrees that, in the event Licensor suspects a violation of this Agreement, particularly in cases where the Library is commercially used without conforming to the commercial use conditions, the User hereby waives all rights to keep the codes that uses the Library confidential. This waiver includes but is not limited to any obligation to maintain confidentiality regarding the Library and its usage. In such instances, the User shall not assert any right to confidentiality with respect to the Library, and the User shall fully cooperate with Licensor in any legal proceedings, including the revelation of the code without prior notice. 
+
+## In Relation Of User's Third Parties
+
+The User acknowledges that if the Library is used or possesed by the User's third parties, the User's third parties would also follow the terms and conditions of this Agreement.
 
 ## Governing Law
 
