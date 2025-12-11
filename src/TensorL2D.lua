@@ -1997,7 +1997,13 @@ function AqwamTensorLibrary:sample(tensor, dimension)
 
 	local resultTensor = {}
 	
-	if (dimension == 1) then tensor = AqwamTensorLibrary:transpose(tensor) end
+	if (dimension == 1) then 
+		
+		tensor = AqwamTensorLibrary:transpose(tensor)
+		
+		numberOfRows, numberOfColumns = numberOfColumns, numberOfRows
+		
+	end
 	
 	for i = 1, numberOfRows, 1 do
 
