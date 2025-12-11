@@ -904,13 +904,13 @@ local function calculateStandardDeviation(tensor)
 
 		for column, value in ipairs(rowVector) do
 
-			sum = sum + math.pow((value - mean), 2)
+			sum = sum + (value - mean)
 
 		end
 
 	end
 
-	local variance = sum / numberOfElements
+	local variance = (sum^2) / numberOfElements
 
 	local standardDeviation = math.sqrt(variance)
 
@@ -1919,17 +1919,21 @@ function AqwamTensorLibrary:flip(tensor, dimension)
 	
 	local resultTensor = {}
 	
+	local unwrappedResultVector
+	
 	if (dimension == 1) then
 		
 		for i = 1, numberOfRows, 1 do
 			
-			resultTensor[i] = {}
+			unwrappedResultVector = {}
 			
 			for j = 1, numberOfColumns, 1 do
 				
-				resultTensor[i][j] = tensor[(numberOfRows - i) + 1][j]
+				unwrappedResultVector[j] = tensor[(numberOfRows - i) + 1][j]
 				
 			end
+			
+			resultTensor[i] = unwrappedResultVector
 			
 		end
 		
@@ -1937,13 +1941,15 @@ function AqwamTensorLibrary:flip(tensor, dimension)
 		
 		for i = 1, numberOfRows, 1 do
 
-			resultTensor[i] = {}
+			unwrappedResultVector = {}
 			
 			for j = 1, numberOfColumns, 1 do
 				
-				resultTensor[i][j] = tensor[i][(numberOfColumns - j) + 1]
+				unwrappedResultVector[j] = tensor[i][(numberOfColumns - j) + 1]
 				
 			end
+			
+			resultTensor[i] = unwrappedResultVector
 
 		end
 		
@@ -1955,6 +1961,76 @@ function AqwamTensorLibrary:flip(tensor, dimension)
 
 	return resultTensor
 	
+end
+
+function AqwamTensorLibrary:sample(tensor, dimension)
+	
+	if (dimension <= 0) then error("The dimension cannot be less than or equal to zero.") end
+	
+	if (dimension > 2) then error("The dimension cannot be greater than 2.") end
+
+	local dimensionSizeArray = AqwamTensorLibrary:getDimensionSizeArray(tensor)
+
+	local numberOfRows = dimensionSizeArray[1]
+
+	local numberOfColumns = dimensionSizeArray[2]
+	
+	local absoluteTensor = AqwamTensorLibrary:applyFunction(math.abs, tensor)
+
+	local sumAbsoluteTensor = AqwamTensorLibrary:sum(absoluteTensor, dimension)
+
+	local probabilityTensor = AqwamTensorLibrary:divide(absoluteTensor, sumAbsoluteTensor)
+	
+	local newDimensionSizeArray = table.clone(dimensionSizeArray)
+	
+	newDimensionSizeArray[dimension] = 1
+
+	local randomProbabilityTensor = AqwamTensorLibrary:createRandomUniformTensor(newDimensionSizeArray, 0, 1)
+	
+	local randomProbabilityValue
+	
+	local unwrappedProbabilityVector
+	
+	local cumulativeProbabilityValue
+	
+	local index
+
+	local resultTensor = {}
+	
+	if (dimension == 1) then tensor = AqwamTensorLibrary:transpose(tensor) end
+	
+	for i = 1, numberOfRows, 1 do
+
+		unwrappedProbabilityVector = probabilityTensor[i]
+
+		randomProbabilityValue = randomProbabilityTensor[i][1]
+
+		cumulativeProbabilityValue = 0
+
+		index = nil
+
+		for j = 1, numberOfColumns, 1 do
+
+			cumulativeProbabilityValue = cumulativeProbabilityValue + unwrappedProbabilityVector[j]
+
+			if (cumulativeProbabilityValue >= randomProbabilityValue) then
+
+				index = j
+
+				break
+
+			end
+
+		end
+
+		resultTensor[i] = {index}
+
+	end
+	
+	if (dimension == 1) then resultTensor = AqwamTensorLibrary:transpose(resultTensor) end
+
+	return resultTensor
+
 end
 
 return AqwamTensorLibrary
