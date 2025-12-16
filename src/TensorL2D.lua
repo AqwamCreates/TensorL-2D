@@ -746,7 +746,6 @@ function AqwamTensorLibrary:getDimensionSizeArray(...)
 
 end
 
-
 function AqwamTensorLibrary:transpose(tensor)
 
 	local numberOfRows = #tensor
