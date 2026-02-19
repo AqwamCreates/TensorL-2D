@@ -2038,4 +2038,68 @@ function AqwamTensorLibrary:sample(tensor, dimension)
 
 end
 
+function AqwamTensorLibrary:createUpperTriangularTensor(dimensionSizeArray, diagonalValue, offDiagonalValue)
+
+	local numberOfRows = dimensionSizeArray[1]
+
+	local numberOfColumns = dimensionSizeArray[2]
+
+	local resultTensor = {}
+
+	local unwrappedResultTensor
+
+	diagonalValue = diagonalValue or 1
+
+	offDiagonalValue = offDiagonalValue or diagonalValue
+
+	for i = 1, numberOfRows, 1 do
+
+		unwrappedResultTensor = table.create(numberOfColumns, 0)
+
+		for j = i, numberOfColumns, 1 do 
+
+			unwrappedResultTensor[j] = ((j == i) and diagonalValue) or offDiagonalValue
+
+		end
+
+		resultTensor[i] = unwrappedResultTensor
+
+	end
+
+	return resultTensor
+
+end
+
+function AqwamTensorLibrary:createLowerTriangularTensor(dimensionSizeArray, diagonalValue, offDiagonalValue)
+	
+	local numberOfRows = dimensionSizeArray[1]
+	
+	local numberOfColumns = dimensionSizeArray[2]
+	
+	local resultTensor = {}
+	
+	local unwrappedResultTensor
+	
+	diagonalValue = diagonalValue or 1
+	
+	offDiagonalValue = offDiagonalValue or diagonalValue
+	
+	for i = 1, numberOfRows, 1 do
+		
+		unwrappedResultTensor = table.create(numberOfColumns, 0)
+		
+		for j = 1, i, 1 do 
+			
+			unwrappedResultTensor[j] = ((j == i) and diagonalValue) or offDiagonalValue
+			
+		end
+		
+		resultTensor[i] = unwrappedResultTensor
+		
+	end
+	
+	return resultTensor
+	
+end
+
 return AqwamTensorLibrary
