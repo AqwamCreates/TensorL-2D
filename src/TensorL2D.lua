@@ -621,8 +621,6 @@ function AqwamTensorLibrary:createRandomNormalTensor(dimensionSizeArray, mean, s
 
 	local result = {}
 
-	local random = Random.new()
-
 	mean = mean or 0
 
 	standardDeviation = standardDeviation or 1
@@ -633,9 +631,9 @@ function AqwamTensorLibrary:createRandomNormalTensor(dimensionSizeArray, mean, s
 
 		for column = 1, numberOfColumns do
 
-			local randomNumber1 = random:NextNumber()
+			local randomNumber1 = math.random()
 
-			local randomNumber2 = random:NextNumber()
+			local randomNumber2 = math.random()
 
 			local zScore = math.sqrt(-2 * math.log(randomNumber1)) * math.cos(2 * math.pi * randomNumber2)
 
