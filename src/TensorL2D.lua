@@ -279,11 +279,11 @@ local function dotProduct(tensor1, tensor2)
 
 end
 
-local function generateArgumentErrorString(tensors, firstTensorIndex, secondTensorIndex)
+local function generateArgumentErrorString(tensorArray, firstTensorIndex, secondTensorIndex)
 
 	local text1 = "Argument " .. firstTensorIndex .. " and " .. secondTensorIndex .. " are incompatible! "
 
-	local text2 = "(" ..  #tensors[firstTensorIndex] .. ", " .. #tensors[firstTensorIndex][1] .. ") and " .. "(" ..  #tensors[secondTensorIndex] .. ", " .. #tensors[secondTensorIndex][1] .. ")"
+	local text2 = "(" ..  #tensorArray[firstTensorIndex] .. ", " .. #tensorArray[firstTensorIndex][1] .. ") and " .. "(" ..  #tensorArray[secondTensorIndex] .. ", " .. #tensorArray[secondTensorIndex][1] .. ")"
 
 	local text = text1 .. text2
 
@@ -395,11 +395,11 @@ end
 
 local function applyFunctionUsingMultipleTensors(functionToApply, ...)
 
-	local tensors = {...}
+	local tensorArray = {...}
 
-	local numberOfTensors = #tensors
+	local numberOfTensors = #tensorArray
 
-	local tensor = tensors[1]
+	local tensor = tensorArray[1]
 
 	if (numberOfTensors == 1) then 
 
@@ -417,7 +417,7 @@ local function applyFunctionUsingMultipleTensors(functionToApply, ...)
 
 	for i = 2, numberOfTensors, 1 do
 
-		local otherTensor = tensors[i]
+		local otherTensor = tensorArray[i]
 
 		local isFirstValueIsTensor = (type(tensor) == "table")
 
@@ -547,19 +547,19 @@ end
 
 function AqwamTensorLibrary:dotProduct(...)
 
-	local tensors = {...}
+	local tensorArray = {...}
 
-	local result = tensors[1]
+	local result = tensorArray[1]
 	
 	local secondTensor
 
 	result = convertToTensorIfScalar(result)
 
-	for i = 2, #tensors, 1 do
+	for i = 2, #tensorArray, 1 do
 
 		result = convertToTensorIfScalar(result)
 		
-		secondTensor = convertToTensorIfScalar(tensors[i])
+		secondTensor = convertToTensorIfScalar(tensorArray[i])
 
 		result = dotProduct(result, secondTensor)
 
@@ -1006,11 +1006,11 @@ function AqwamTensorLibrary:printTensor(...)
 
 	local generatedText
 
-	local tensors = {...}
+	local tensorArray = {...}
 
-	for tensorNumber = 1, #tensors, 1 do
+	for tensorNumber = 1, #tensorArray, 1 do
 
-		generatedText = AqwamTensorLibrary:generateTensorString(tensors[tensorNumber])
+		generatedText = AqwamTensorLibrary:generateTensorString(tensorArray[tensorNumber])
 
 		text = text .. generatedText
 
@@ -1098,11 +1098,11 @@ function AqwamTensorLibrary:printTensorWithComma(...)
 
 	local generatedText
 
-	local tensors = {...}
+	local tensorArray = {...}
 
-	for tensorNumber = 1, #tensors, 1 do
+	for tensorNumber = 1, #tensorArray, 1 do
 
-		generatedText = AqwamTensorLibrary:generateTensorWithCommaString(tensors[tensorNumber])
+		generatedText = AqwamTensorLibrary:generateTensorWithCommaString(tensorArray[tensorNumber])
 
 		text = text .. generatedText
 
@@ -1193,11 +1193,11 @@ function AqwamTensorLibrary:printPortableTensor(...)
 
 	local generatedText
 
-	local tensors = {...}
+	local tensorArray = {...}
 
-	for tensorNumber = 1, #tensors, 1 do
+	for tensorNumber = 1, #tensorArray, 1 do
 
-		generatedText = AqwamTensorLibrary:generatePortableTensorString(tensors[tensorNumber])
+		generatedText = AqwamTensorLibrary:generatePortableTensorString(tensorArray[tensorNumber])
 
 		text = text .. generatedText
 
@@ -1287,24 +1287,24 @@ end
 
 function AqwamTensorLibrary:rowConcatenate(...)
 
-	local tensors = {...}
+	local tensorArray = {...}
 
-	local lastTensorIndex = #tensors
+	local lastTensorIndex = #tensorArray
 	local secondLastTensorIndex = lastTensorIndex - 1 
 
-	local result = tensors[1]
+	local result = tensorArray[1]
 
-	for i = 2, #tensors, 1 do
+	for i = 2, #tensorArray, 1 do
 
 		local success = pcall(function()
 
-			result = rowConcatenate(result, tensors[i])
+			result = rowConcatenate(result, tensorArray[i])
 
 		end)
 
 		if (not success) then
 
-			local text = generateArgumentErrorString(tensors, i - 1, i)
+			local text = generateArgumentErrorString(tensorArray, i - 1, i)
 
 			error(text)
 
@@ -1318,24 +1318,24 @@ end
 
 function AqwamTensorLibrary:columnConcatenate(...)
 
-	local tensors = {...}
+	local tensorArray = {...}
 
-	local lastTensorIndex = #tensors
+	local lastTensorIndex = #tensorArray
 	local secondLastTensorIndex = lastTensorIndex - 1 
 
-	local result = tensors[1]
+	local result = tensorArray[1]
 
-	for i = 2, #tensors, 1 do
+	for i = 2, #tensorArray, 1 do
 
 		local success = pcall(function()
 
-			result = columnConcatenate(result, tensors[i])
+			result = columnConcatenate(result, tensorArray[i])
 
 		end)
 
 		if (not success) then
 
-			local text = generateArgumentErrorString(tensors, i - 1, i)
+			local text = generateArgumentErrorString(tensorArray, i - 1, i)
 
 			error(text)
 
