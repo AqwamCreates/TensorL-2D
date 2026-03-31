@@ -1351,7 +1351,7 @@ function AqwamTensorLibrary:concatenate(tensor1, tensor2, dimension)
 	
 	if (type(tensor1) == "number") then tensor1 = {{tensor1}} end
 	
-	if (type(tensor2) == "number") then tensor1 = {{tensor2}} end
+	if (type(tensor2) == "number") then tensor2 = {{tensor2}} end
 
 	if (dimension == 1) then
 
