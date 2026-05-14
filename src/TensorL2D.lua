@@ -2104,4 +2104,48 @@ function AqwamTensorLibrary:createLowerTriangularTensor(dimensionSizeArray, diag
 	
 end
 
+function AqwamTensorLibrary:convertToDiagonalTensor(tensor)
+	
+	local dimensionSizeArray = AqwamTensorLibrary:getDimensionSizeArray(tensor)
+	
+	local numberOfRows = dimensionSizeArray[1]
+	
+	local numberOfColumns = dimensionSizeArray[2]
+	
+	if (numberOfRows ~= 1) and (numberOfColumns ~= 1) then error("Invalid tensor.") end
+	
+	local resultTensor = {}
+	
+	local unwrappedResultTensor
+	
+	if (numberOfRows == 1) then
+		
+		for i = 1, numberOfColumns, 1 do
+			
+			unwrappedResultTensor = table.create(numberOfColumns, 0)
+			
+			unwrappedResultTensor[i] = tensor[1][i]
+			
+			resultTensor[i] = unwrappedResultTensor
+			
+		end
+		
+	elseif (numberOfColumns == 1) then
+		
+		for i = 1, numberOfRows, 1 do
+
+			unwrappedResultTensor = table.create(numberOfRows, 0)
+
+			unwrappedResultTensor[i] = tensor[i][1]
+
+			resultTensor[i] = unwrappedResultTensor
+
+		end
+		
+	end
+	
+	return resultTensor
+	
+end
+
 return AqwamTensorLibrary
