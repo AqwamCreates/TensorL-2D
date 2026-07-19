@@ -804,7 +804,7 @@ local function rowSum(tensor)
 
 	local numberOfColumns = #tensor[1]
 
-	local resultVector = {}
+	local resultVector = table.create(numberOfColumns, 0)
 	
 	for _, rowVector in ipairs(tensor) do
 		
@@ -826,7 +826,7 @@ local function columnSum(tensor)
 
 	local numberOfRows = #tensor
 	
-	local columnSumArray = {}
+	local columnSumArray = table.create(numberOfRows, 0)
 
 	for rowIndex, rowVector in ipairs(tensor) do
 
