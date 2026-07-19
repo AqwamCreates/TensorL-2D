@@ -40,7 +40,7 @@ local function deepCopyTable(original, copies)
 
 	if (originalType == 'table') then
 
-		if copies[original] then
+		if (copies[original]) then
 
 			copy = copies[original]
 
@@ -89,6 +89,7 @@ local function checkIfCanBroadcast(tensor1, tensor2)
 	local tensor2Columns = #tensor2[1]
 
 	local isTensor1Broadcasted
+	
 	local isTensor2Broadcasted
 
 	local hasSamenumberOfRows = (tensor1Rows == tensor2Rows)
