@@ -237,6 +237,7 @@ end
 local function checkIfCanDotProduct(tensor1, tensor2)
 
 	local tensor1Column = #tensor1[1]
+	
 	local tensor2Row = #tensor2
 
 	if (tensor1Column ~= tensor2Row) then
@@ -252,8 +253,11 @@ local function dotProduct(tensor1, tensor2)
 	local resultTensor = {}
 
 	local tensor1Row = #tensor1
+	
 	local tensor1Column = #tensor1[1]
+	
 	local tensor2Column = #tensor2[1]
+	
 	
 	local tensor1Array
 
@@ -503,37 +507,37 @@ end
 
 function AqwamTensorLibrary:areValuesEqual(...)
 
-	return applyFunctionUsingMultipleTensors(function(a, b) return a == b end, ...)
+	return applyFunctionUsingMultipleTensors(function(a, b) return (a == b) end, ...)
 
 end
 
 function AqwamTensorLibrary:areValuesGreater(...)
 
-	return applyFunctionUsingMultipleTensors(function(a, b) return a > b end, ...)
+	return applyFunctionUsingMultipleTensors(function(a, b) return (a > b) end, ...)
 
 end
 
 function AqwamTensorLibrary:areValuesGreaterOrEqual(...)
 
-	return applyFunctionUsingMultipleTensors(function(a, b) return a >= b end, ...)
+	return applyFunctionUsingMultipleTensors(function(a, b) return (a >= b) end, ...)
 
 end
 
 function AqwamTensorLibrary:areValuesLesser(...)
 
-	return applyFunctionUsingMultipleTensors(function(a, b) return a < b end, ...)
+	return applyFunctionUsingMultipleTensors(function(a, b) return (a < b) end, ...)
 
 end
 
 function AqwamTensorLibrary:areValuesLesserOrEqual(...)
 
-	return applyFunctionUsingMultipleTensors(function(a, b) return a <= b end, ...)
+	return applyFunctionUsingMultipleTensors(function(a, b) return (a <= b) end, ...)
 
 end
 
 function AqwamTensorLibrary:areTensorsEqual(...)
 
-	local resultTensor = applyFunctionUsingMultipleTensors(function(a, b) return a == b end, ...)
+	local resultTensor = applyFunctionUsingMultipleTensors(function(a, b) return (a == b) end, ...)
 	
 	for _, rowVector in ipairs(resultTensor) do
 		
@@ -981,7 +985,8 @@ function AqwamTensorLibrary:generateTensorString(tensor)
 
 	local columnWidths = {}
 
-	-- Calculate maximum width for each columnIndex
+	-- Calculate maximum width for each columnIndex.
+	
 	for columnIndex = 1, numberOfColumns, 1 do
 
 		local maxWidth = 0
@@ -1060,7 +1065,8 @@ function AqwamTensorLibrary:generateTensorWithCommaString(tensor)
 
 	local columnWidths = {}
 
-	-- Calculate maximum width for each columnIndex
+	-- Calculate maximum width for each columnIndex.
+	
 	for columnIndex = 1, numberOfColumns, 1 do
 
 		local maxWidth = 0
@@ -1152,7 +1158,8 @@ function AqwamTensorLibrary:generatePortableTensorString(tensor)
 
 	local columnWidths = {}
 
-	-- Calculate maximum width for each columnIndex
+	-- Calculate maximum width for each columnIndex.
+	
 	for columnIndex = 1, numberOfColumns, 1 do
 
 		local maxWidth = 0
@@ -1336,6 +1343,7 @@ function AqwamTensorLibrary:rowConcatenate(...)
 	local tensorArray = {...}
 
 	local lastTensorIndex = #tensorArray
+	
 	local secondLastTensorIndex = lastTensorIndex - 1 
 
 	local resultTensor = tensorArray[1]
@@ -1367,6 +1375,7 @@ function AqwamTensorLibrary:columnConcatenate(...)
 	local tensorArray = {...}
 
 	local lastTensorIndex = #tensorArray
+	
 	local secondLastTensorIndex = lastTensorIndex - 1 
 
 	local resultTensor = tensorArray[1]
@@ -1834,7 +1843,7 @@ local function determinantInverse(tensor)
 
 	local determinant = AqwamTensorLibrary:determinant(tensor)
 
-	if (determinant == 0) then return end -- tensor is not invertible
+	if (determinant == 0) then return end -- Tensor is not invertible.
 
 	if (dimensionSize == 1) then return {{1 / determinant}} end
 
