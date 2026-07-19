@@ -91,15 +91,15 @@ local function checkIfCanBroadcast(tensor1, tensor2)
 	local isTensor1Broadcasted
 	local isTensor2Broadcasted
 
-	local hasSameRowSize = (tensor1Rows == tensor2Rows)
+	local hasSamenumberOfRows = (tensor1Rows == tensor2Rows)
 
-	local hasSameColumnSize = (tensor1Columns == tensor2Columns)
+	local hasSamenumberOfColumns = (tensor1Columns == tensor2Columns)
 
-	local hasSameDimension = hasSameRowSize and hasSameColumnSize
+	local hasSameDimension = hasSamenumberOfRows and hasSamenumberOfColumns
 
-	local isTensor1IsLargerInOneDimension = ((tensor1Rows > 1) and hasSameColumnSize and (tensor2Rows == 1)) or ((tensor1Columns > 1) and hasSameRowSize and (tensor2Columns == 1))
+	local isTensor1IsLargerInOneDimension = ((tensor1Rows > 1) and hasSamenumberOfColumns and (tensor2Rows == 1)) or ((tensor1Columns > 1) and hasSamenumberOfRows and (tensor2Columns == 1))
 
-	local isTensor2IsLargerInOneDimension = ((tensor2Rows > 1) and hasSameColumnSize and (tensor1Rows == 1)) or ((tensor2Columns > 1) and hasSameRowSize and (tensor1Columns == 1))
+	local isTensor2IsLargerInOneDimension = ((tensor2Rows > 1) and hasSamenumberOfColumns and (tensor1Rows == 1)) or ((tensor2Columns > 1) and hasSamenumberOfRows and (tensor1Columns == 1))
 
 	local isTensor1Scalar = (tensor1Rows == 1) and (tensor1Columns == 1)
 
@@ -112,16 +112,19 @@ local function checkIfCanBroadcast(tensor1, tensor2)
 	if (hasSameDimension) then
 
 		isTensor1Broadcasted = false
+		
 		isTensor2Broadcasted = false
 
 	elseif (isTensor2IsLargerInOneDimension) or (isTensor2Larger and isTensor1Scalar) then
 
 		isTensor1Broadcasted = true
+		
 		isTensor2Broadcasted = false
 
 	elseif (isTensor1IsLargerInOneDimension) or (isTensor1Larger and isTensor2Scalar) then
 
 		isTensor1Broadcasted = false
+		
 		isTensor2Broadcasted = true
 
 	else
@@ -134,47 +137,53 @@ local function checkIfCanBroadcast(tensor1, tensor2)
 
 end
 
-function AqwamTensorLibrary:expand(tensor, targetRowSize, targetColumnSize)
+function AqwamTensorLibrary:expand(tensor, targetnumberOfRows, targetnumberOfColumns)
 
-	local result = {}
+	local resultTensor = {}
 
-	local isTensorRowSizeEqualToOne = (#tensor == 1)
+	local isTensornumberOfRowsEqualToOne = (#tensor == 1)
 
-	local isTensorColumnSizeEqualToOne = (#tensor[1] == 1)
+	local isTensornumberOfColumnsEqualToOne = (#tensor[1] == 1)
 
-	if (isTensorRowSizeEqualToOne) and (not isTensorColumnSizeEqualToOne) then
+	if (isTensornumberOfRowsEqualToOne) and (not isTensornumberOfColumnsEqualToOne) then
 
-		for row = 1, targetRowSize, 1 do
+		for row = 1, targetnumberOfRows, 1 do
+			
+			local resultVector = {}
 
-			result[row] = {}
-
-			for column = 1, targetColumnSize, 1 do result[row][column] = tensor[1][column] end
-
-		end
-
-	elseif (not isTensorRowSizeEqualToOne) and (isTensorColumnSizeEqualToOne) then
-
-		for row = 1, targetRowSize, 1 do
-
-			result[row] = {}
-
-			for column = 1, targetColumnSize, 1 do result[row][column] = tensor[row][1] end
+			for column = 1, targetnumberOfColumns, 1 do resultVector[column] = tensor[1][column] end
+			
+			resultTensor[row] = resultVector
 
 		end
 
-	elseif (isTensorRowSizeEqualToOne) and (isTensorColumnSizeEqualToOne) then
+	elseif (not isTensornumberOfRowsEqualToOne) and (isTensornumberOfColumnsEqualToOne) then
 
-		for row = 1, targetRowSize, 1 do
+		for row = 1, targetnumberOfRows, 1 do
 
-			result[row] = {}
+			local resultVector = {}
 
-			for column = 1, targetColumnSize, 1 do result[row][column] = tensor[1][1] end
+			for column = 1, targetnumberOfColumns, 1 do resultVector[column] = tensor[row][1] end
+			
+			resultTensor[row] = resultVector
+
+		end
+
+	elseif (isTensornumberOfRowsEqualToOne) and (isTensornumberOfColumnsEqualToOne) then
+
+		for row = 1, targetnumberOfRows, 1 do
+
+			local resultVector = {}
+
+			for column = 1, targetnumberOfColumns, 1 do resultVector[column] = tensor[1][1] end
+			
+			resultTensor[row] = resultVector
 
 		end
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -201,16 +210,10 @@ function AqwamTensorLibrary:broadcast(tensor1, tensor2)
 end
 
 local function convertToTensorIfScalar(value)
+	
+	local isAScalar = (type(value) ~= "table")
 
-	local isNotScalar
-
-	isNotScalar = pcall(function()
-
-		local testForScalar = value[1][1]
-
-	end)
-
-	if not isNotScalar then
+	if (isAScalar) then
 
 		return {{value}}
 
@@ -245,7 +248,7 @@ end
 
 local function dotProduct(tensor1, tensor2)
 
-	local result = {}
+	local resultTensor = {}
 
 	local tensor1Row = #tensor1
 	local tensor1Column = #tensor1[1]
@@ -257,7 +260,7 @@ local function dotProduct(tensor1, tensor2)
 
 	for row = 1, tensor1Row, 1 do
 		
-		local resultArray = {}
+		local resultVector = {}
 		
 		tensor1Array = tensor1[row]
 
@@ -267,15 +270,15 @@ local function dotProduct(tensor1, tensor2)
 
 			for i = 1, tensor1Column do sum = sum + (tensor1Array[i] * tensor2[i][column]) end
 
-			resultArray[column] = sum
+			resultVector[column] = sum
 
 		end
 		
-		result[row] = resultArray
+		resultTensor[row] = resultVector
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -293,25 +296,25 @@ end
 
 local function applyFunctionUsingOneTensor(functionToApply, tensor)
 
-	local result = {}
+	local resultTensor = {}
 
-	local resultrowVector
+	local resultVector
 
 	for row, rowVector in ipairs(tensor) do
 
-		resultrowVector = {}
+		resultVector = {}
 
 		for column, value in ipairs(rowVector) do
 
-			resultrowVector[column] = functionToApply(value)
+			resultVector[column] = functionToApply(value)
 
 		end
 
-		result[row] = resultrowVector
+		resultTensor[row] = resultVector
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -319,9 +322,9 @@ local function applyFunctionUsingTwoTensors(functionToApply, tensor1, tensor2)
 
 	if (#tensor1 ~= #tensor2) or (#tensor1[1] ~= #tensor2[1]) then error("Incompatible Dimensions! (" .. #tensor1 .." x " .. #tensor1[1] .. ") and (" .. #tensor2 .. " x " .. #tensor2[1] .. ")") end
 
-	local result = {}
+	local resultTensor = {}
 
-	local resultrowVector
+	local resultVector
 	
 	local rowVector2
 
@@ -329,67 +332,67 @@ local function applyFunctionUsingTwoTensors(functionToApply, tensor1, tensor2)
 		
 		rowVector2 = tensor2[row]
 
-		resultrowVector = {}
+		resultVector = {}
 		
 		for column, value in ipairs(rowVector1) do
 
-			resultrowVector[column] = functionToApply(value, rowVector2[column])
+			resultVector[column] = functionToApply(value, rowVector2[column])
 
 		end
 
-		result[row] = resultrowVector
+		resultTensor[row] = resultVector
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
 local function applyFunctionWhenTheFirstValueIsAScalar(functionToApply, scalar, tensor)
 
-	local result = {}
+	local resultTensor = {}
 	
-	local resultrowVector
+	local resultVector
 	
 	for row, rowVector in ipairs(tensor) do
 		
-		resultrowVector = {}
+		resultVector = {}
 		
 		for column, value in ipairs(rowVector) do
 			
-			resultrowVector[column] = functionToApply(scalar, value)
+			resultVector[column] = functionToApply(scalar, value)
 			
 		end
 		
-		result[row] = resultrowVector
+		resultTensor[row] = resultVector
 		
 	end
 
-	return result
+	return resultTensor
 
 end
 
 local function applyFunctionWhenTheSecondValueIsAScalar(functionToApply, tensor, scalar)
 
-	local result = {}
+	local resultTensor = {}
 
-	local resultrowVector
+	local resultVector
 
 	for row, rowVector in ipairs(tensor) do
 
-		resultrowVector = {}
+		resultVector = {}
 
 		for column, value in ipairs(rowVector) do
 
-			resultrowVector[column] = functionToApply(value, scalar)
+			resultVector[column] = functionToApply(value, scalar)
 
 		end
 
-		result[row] = resultrowVector
+		resultTensor[row] = resultVector
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -549,23 +552,23 @@ function AqwamTensorLibrary:dotProduct(...)
 
 	local tensorArray = {...}
 
-	local result = tensorArray[1]
+	local resultTensor = tensorArray[1]
 	
 	local secondTensor
 
-	result = convertToTensorIfScalar(result)
+	resultTensor = convertToTensorIfScalar(resultTensor)
 
 	for i = 2, #tensorArray, 1 do
 
-		result = convertToTensorIfScalar(result)
+		resultTensor = convertToTensorIfScalar(resultTensor)
 		
 		secondTensor = convertToTensorIfScalar(tensorArray[i])
 
-		result = dotProduct(result, secondTensor)
+		resultTensor = dotProduct(resultTensor, secondTensor)
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -577,23 +580,21 @@ function AqwamTensorLibrary:createIdentityTensor(dimensionSizeArray, value)
 
 	local numberOfColumns = dimensionSizeArray[2]
 
-	local result = {}
-	
-	local array
+	local resultTensor = {}
 	
 	value = value or 1
 
 	for row = 1, numberOfRows, 1 do
 		
-		array = table.create(numberOfColumns, 0) 
+		local rowVector = table.create(numberOfColumns, 0) 
 		
-		array[row] = value
+		rowVector[row] = value
 		
-		result[row] = array
+		resultTensor[row] = rowVector
 		
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -605,11 +606,11 @@ function AqwamTensorLibrary:createTensor(dimensionSizeArray, allValues)
 	
 	allValues = allValues or 0
 
-	local result = {}
+	local resultTensor = {}
 	
-	for row = 1, numberOfRows, 1 do result[row] = table.create(numberOfColumns, allValues) end
+	for row = 1, numberOfRows, 1 do resultTensor[row] = table.create(numberOfColumns, allValues) end
 
-	return result
+	return resultTensor
 
 end
 
@@ -619,15 +620,15 @@ function AqwamTensorLibrary:createRandomNormalTensor(dimensionSizeArray, mean, s
 
 	local numberOfColumns = dimensionSizeArray[2]
 
-	local result = {}
+	local resultTensor = {}
 
 	mean = mean or 0
 
 	standardDeviation = standardDeviation or 1
 
-	for row = 1, numberOfRows do
-
-		result[row] = {}
+	for row = 1, numberOfRows, 1 do
+		
+		local resultVector = {}
 
 		for column = 1, numberOfColumns do
 
@@ -637,12 +638,15 @@ function AqwamTensorLibrary:createRandomNormalTensor(dimensionSizeArray, mean, s
 
 			local zScore = math.sqrt(-2 * math.log(randomNumber1)) * math.cos(2 * math.pi * randomNumber2)
 
-			result[row][column] = (zScore * standardDeviation) + mean
+			resultVector[column] = (zScore * standardDeviation) + mean
 
 		end
+		
+		resultTensor[row] = resultVector
+		
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -652,7 +656,7 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 
 	local numberOfColumns = dimensionSizeArray[2]
 
-	local result = {}
+	local resultTensor = {}
 	
 	if (minimumValue) and (maximumValue) then
 		
@@ -662,13 +666,15 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 		
 		for row = 1, numberOfRows, 1 do
 
-			result[row] = {}
+			local resultVector = {}
 
 			for column = 1, numberOfColumns, 1 do
 
-				result[row][column] = minimumValue + (math.random() * rangeValue)
+				resultVector[column] = minimumValue + (math.random() * rangeValue)
 
 			end
+			
+			resultTensor[row] = resultVector
 
 		end
 		
@@ -678,13 +684,15 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 
 		for row = 1, numberOfRows, 1 do
 
-			result[row] = {}
+			local resultVector = {}
 
 			for column = 1, numberOfColumns, 1 do
 
-				result[row][column] = math.random() * maximumValue
+				resultVector[column] = math.random() * maximumValue
 
-			end	
+			end
+			
+			resultTensor[row] = resultVector
 
 		end
 
@@ -694,13 +702,15 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 
 		for row = 1, numberOfRows, 1 do
 
-			result[row] = {}
+			local resultVector = {}
 
 			for column = 1, numberOfColumns, 1 do
 
-				result[row][column] = math.random() * minimumValue
+				resultVector[column] = math.random() * minimumValue
 
 			end	
+			
+			resultTensor[row] = resultVector
 
 		end
 		
@@ -708,19 +718,21 @@ function AqwamTensorLibrary:createRandomUniformTensor(dimensionSizeArray, minimu
 
 		for row = 1, numberOfRows, 1 do
 
-			result[row] = {}
+			local resultVector = {}
 
 			for column = 1, numberOfColumns, 1 do
 
-				result[row][column] = (math.random() * 2) - 1
+				resultVector[column] = (math.random() * 2) - 1
 
-			end	
+			end
+			
+			resultTensor[row] = resultVector
 
 		end
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -745,23 +757,28 @@ function AqwamTensorLibrary:getDimensionSizeArray(...)
 end
 
 function AqwamTensorLibrary:transpose(tensor)
-
-	local numberOfRows = #tensor
-	local numberOfColumns = #tensor[1]
-
-	local result = AqwamTensorLibrary:createTensor({numberOfColumns, numberOfRows})
 	
-	for row, rowVector in ipairs(tensor) do
+	local numberOfRows = #tensor
 
-		for column, value in ipairs(rowVector) do
-
-			result[column][row] = value
-
+	local numberOfColumns = #tensor[1]
+	
+	local resultTensor = {}
+	
+	for column = 1, numberOfColumns, 1 do
+		
+		local resultVector = {}
+		
+		for row = 1, numberOfRows, 1 do
+			
+			resultVector[row] = tensor[row][column]
+			
 		end
-
+		
+		resultTensor[column] = resultVector
+		
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -787,39 +804,45 @@ local function rowSum(tensor)
 
 	local numberOfColumns = #tensor[1]
 
-	local result = AqwamTensorLibrary:createTensor({1, numberOfColumns})
+	local resultVector = {}
 	
 	for _, rowVector in ipairs(tensor) do
 		
 		for column, value in ipairs(rowVector) do
 			
-			result[1][column] = result[1][column] + value
+			resultVector[column] = resultVector[column] + value
 			
 		end
 		
 	end
+	
+	local resultTensor = {resultVector}
 
-	return result
+	return resultTensor
 
 end
 
 local function columnSum(tensor)
 
 	local numberOfRows = #tensor
-
-	local result = AqwamTensorLibrary:createTensor({numberOfRows, 1})
+	
+	local columnSumArray = {}
 
 	for row, rowVector in ipairs(tensor) do
 
-		for _, value in ipairs(rowVector) do
+		for column, value in ipairs(rowVector) do
 
-			result[row][1] = result[row][1] + value
+			columnSumArray[row] = columnSumArray[row] + value
 
 		end
 
 	end
+	
+	local resultTensor = {}
+	
+	for row = 1, numberOfRows, 1 do resultTensor[row] = {columnSumArray[row]} end
 
-	return result
+	return resultTensor
 
 end
 
@@ -895,19 +918,23 @@ local function calculateStandardDeviation(tensor)
 
 	local numberOfElements = #tensor * #tensor[1]
 
-	local sum = 0
+	local sumSquaredDifference = 0
 	
 	for row, rowVector in ipairs(tensor) do
 
 		for column, value in ipairs(rowVector) do
+			
+			local difference = value - mean
+			
+			local squaredDifference = math.pow(difference, 2)
 
-			sum = sum + (value - mean)
+			sumSquaredDifference = sumSquaredDifference + squaredDifference
 
 		end
 
 	end
 
-	local variance = (sum^2) / numberOfElements
+	local variance = sumSquaredDifference / numberOfElements
 
 	local standardDeviation = math.sqrt(variance)
 
@@ -945,7 +972,7 @@ end
 
 function AqwamTensorLibrary:generateTensorString(tensor)
 
-	if tensor == nil then return "" end
+	if (not tensor) then return "" end
 
 	local numberOfRows = #tensor
 
@@ -1024,7 +1051,7 @@ end
 
 function AqwamTensorLibrary:generateTensorWithCommaString(tensor)
 
-	if tensor == nil then return "" end
+	if (not tensor) then return "" end
 
 	local numberOfRows = #tensor
 
@@ -1116,7 +1143,7 @@ end
 
 function AqwamTensorLibrary:generatePortableTensorString(tensor)
 
-	if tensor == nil then return "" end
+	if (not tensor) then return "" end
 
 	local numberOfRows = #tensor
 
@@ -1211,77 +1238,95 @@ end
 
 local function rowConcatenate(tensor1, tensor2)
 
-	local tensor1ColumnSize = #tensor1[1]
-	local tensor2ColumnSize = #tensor2[1]
+	local tensor1numberOfColumns = #tensor1[1]
+	
+	local tensor2numberOfColumns = #tensor2[1]
 
-	if (tensor1ColumnSize ~= tensor2ColumnSize) then error("Incompatible Tensor Dimensions. Tensor 1 Has " .. tensor1ColumnSize .. " Column(s), Tensor 2 Has " .. tensor2ColumnSize .. " Column(s).") end
+	if (tensor1numberOfColumns ~= tensor2numberOfColumns) then error("Incompatible Tensor Dimensions. Tensor 1 Has " .. tensor1numberOfColumns .. " Column(s), Tensor 2 Has " .. tensor2numberOfColumns .. " Column(s).") end
+	
+	local tensor1numberOfRows = #tensor1
+	
+	local tensor2numberOfRows = #tensor2
 
-	local rowMiddleIndex = #tensor1
+	local rowMiddleIndex = tensor1numberOfRows
 
-	local result = {}
+	local resultTensor = {}
 
-	for row = 1, #tensor1, 1 do
+	for row = 1, tensor1numberOfRows, 1 do
+		
+		local resultVector = {}
 
-		result[row] = {}
+		for column = 1, tensor1numberOfColumns, 1 do
 
-		for column = 1, #tensor1[1], 1 do
+			resultVector[column] = tensor1[row][column]
 
-			result[row][column] = tensor1[row][column]
-
-		end	
-
-	end
-
-	for row = 1, #tensor2, 1 do
-
-		result[rowMiddleIndex + row] = {}
-
-		for column = 1, #tensor2[1], 1 do
-
-			result[rowMiddleIndex + row][column] = tensor2[row][column]
-
-		end	
+		end
+		
+		resultTensor[row] = resultVector
 
 	end
 
-	return result
+	for row = 1, tensor2numberOfRows, 1 do
+		
+		local resultVector = {}
+
+		for column = 1, tensor2numberOfColumns, 1 do
+
+			resultVector[column] = tensor2[row][column]
+
+		end
+		
+		resultTensor[rowMiddleIndex + row] = resultVector
+
+	end
+
+	return resultTensor
 
 end
 
 local function columnConcatenate(tensor1, tensor2)
 
-	local tensor1RowSize = #tensor1
-	local tensor2RowSize = #tensor2
+	local tensor1numberOfRows = #tensor1
+	
+	local tensor2numberOfRows = #tensor2
 
-	if (tensor1RowSize ~= tensor2RowSize) then error("Incompatible Tensor Dimensions. Tensor 1 Has " .. tensor1RowSize .. " Row(s), Tensor 2 Has " .. tensor2RowSize .. " Row(s).") end
+	if (tensor1numberOfRows ~= tensor2numberOfRows) then error("Incompatible Tensor Dimensions. Tensor 1 Has " .. tensor1numberOfRows .. " Row(s), Tensor 2 Has " .. tensor2numberOfRows .. " Row(s).") end
+	
+	local tensor1numberOfColumns = #tensor1[1]
+	
+	local tensor2numberOfColumns = #tensor2[1]
 
 	local columnMiddleIndex = #tensor1[1]
 
-	local result = {}
+	local resultTensor = {}
 
-	for row = 1, #tensor1, 1 do
+	for row = 1, tensor1numberOfRows, 1 do
+		
+		local resultVector = {}
+		
+		local columnIndex = 1
 
-		result[row] = {}
+		for column = 1, tensor1numberOfColumns, 1 do
 
-		for column = 1, #tensor1[1], 1 do
-
-			result[row][column] = tensor1[row][column]
-
-		end	
-
-	end
-
-	for row = 1, #tensor2, 1 do
-
-		for column = 1, #tensor2[1], 1 do
-
-			result[row][columnMiddleIndex + column] = tensor2[row][column]
+			resultVector[columnIndex] = tensor1[row][column]
+			
+			columnIndex = columnIndex + 1
 
 		end
+		
+		for column = 1, tensor2numberOfColumns, 1 do
+
+			resultVector[columnIndex] = tensor2[row][column]
+			
+			columnIndex = columnIndex + 1
+
+		end
+		
+		resultTensor[row] = resultVector
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -1292,13 +1337,13 @@ function AqwamTensorLibrary:rowConcatenate(...)
 	local lastTensorIndex = #tensorArray
 	local secondLastTensorIndex = lastTensorIndex - 1 
 
-	local result = tensorArray[1]
+	local resultTensor = tensorArray[1]
 
 	for i = 2, #tensorArray, 1 do
 
 		local success = pcall(function()
 
-			result = rowConcatenate(result, tensorArray[i])
+			resultTensor = rowConcatenate(resultTensor, tensorArray[i])
 
 		end)
 
@@ -1312,7 +1357,7 @@ function AqwamTensorLibrary:rowConcatenate(...)
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -1323,13 +1368,13 @@ function AqwamTensorLibrary:columnConcatenate(...)
 	local lastTensorIndex = #tensorArray
 	local secondLastTensorIndex = lastTensorIndex - 1 
 
-	local result = tensorArray[1]
+	local resultTensor = tensorArray[1]
 
 	for i = 2, #tensorArray, 1 do
 
 		local success = pcall(function()
 
-			result = columnConcatenate(result, tensorArray[i])
+			resultTensor = columnConcatenate(resultTensor, tensorArray[i])
 
 		end)
 
@@ -1343,7 +1388,7 @@ function AqwamTensorLibrary:columnConcatenate(...)
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -1422,23 +1467,27 @@ function AqwamTensorLibrary:applyFunction(functionToApply, ...)
 	local numberOfRows = dimensionSizeArray[1]
 	local numberOfColumns = dimensionSizeArray[2]
 
-	local result = AqwamTensorLibrary:createTensor(dimensionSizeArray, true)
+	local resultTensor = {}
 
 	local tensorValueArray = {}
 
 	for row = 1, numberOfRows, 1 do
+		
+		local resultVector = {}
 
 		for column = 1, numberOfColumns, 1 do
 
 			for tensorIndex = 1, numberOfTensors, 1 do tensorValueArray[tensorIndex] = tensorArray[tensorIndex][row][column] end 
 
-			result[row][column] = functionToApply(table.unpack(tensorValueArray))
+			resultVector[column] = functionToApply(table.unpack(tensorValueArray))
 
-		end	
+		end
+		
+		resultTensor[row] = resultVector
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -1628,21 +1677,21 @@ function AqwamTensorLibrary:extractRows(tensor, startingRowIndex, endingRowIndex
 
 	local numberOfRows = #tensor
 
-	local result = {}
+	local resultTensor = {}
 
 	for row = startingRowIndex, endingRowIndex do
 
-		table.insert(result, tensor[row])
+		table.insert(resultTensor, tensor[row])
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
 function AqwamTensorLibrary:extractColumns(tensor, startingColumnIndex, endingColumnIndex)
 
-	if (endingColumnIndex == nil) then endingColumnIndex = #tensor end
+	if (not endingColumnIndex) then endingColumnIndex = #tensor[1] end
 
 	if (startingColumnIndex <= 0) then error("The starting column index must be greater than 0.") end 
 
@@ -1650,21 +1699,21 @@ function AqwamTensorLibrary:extractColumns(tensor, startingColumnIndex, endingCo
 
 	local numberOfRows = #tensor
 
-	local result = {}
+	local resultTensor = {}
 
 	for row = 1, numberOfRows, 1 do
 
-		result[row] = {}
+		resultTensor[row] = {}
 
 		for column = startingColumnIndex, endingColumnIndex do 
 
-			table.insert(result[row], tensor[row][column])
+			table.insert(resultTensor[row], tensor[row][column])
 
 		end
 
 	end
 
-	return result
+	return resultTensor
 
 end
 
@@ -1678,21 +1727,23 @@ function AqwamTensorLibrary:extract(tensor, originDimensionIndexArray, targetDim
 	
 	local columnTargetIndex = targetDimensionIndexArray[2]
 	
-	local result = {}
+	local resultTensor = {}
 
 	for row = rowOriginIndex, rowTargetIndex, 1 do
-
-		result[row] = {}
+		
+		local resultVector = {}
 
 		for column = columnOriginIndex, columnTargetIndex, 1 do 
 
-			table.insert(result[row], tensor[row][column])
+			table.insert(resultVector, tensor[row][column])
 
 		end
+		
+		resultTensor[row] = resultVector
 
 	end
 
-	return result
+	return resultTensor
 	
 end
 
@@ -1705,26 +1756,30 @@ end
 function AqwamTensorLibrary:minor(tensor, row, column)
 
 	local dimensionSize = #tensor
+	
+	local dimensionSizeMinusOne = dimensionSize - 1
+	
+	local minorTensor = {}
 
-	local minor = {}
+	for i = 1, dimensionSizeMinusOne, 1 do
+		
+		local minorVector = {}
 
-	for i = 1, dimensionSize - 1 do
-
-		minor[i] = {}
-
-		for j = 1, dimensionSize - 1 do
+		for j = 1, dimensionSizeMinusOne, 1 do
 
 			local mRow = (i < row and i) or (i + 1)
 
 			local mColumn = (j < column and j) or (j + 1)
 
-			minor[i][j] = tensor[mRow][mColumn]
+			minorVector[j] = tensor[mRow][mColumn]
 
 		end
+		
+		minorTensor[i] = minorVector
 
 	end
 
-	return minor
+	return minorTensor
 
 end
 
@@ -1733,8 +1788,12 @@ function  AqwamTensorLibrary:cofactor(tensor, row, column)
 	local minor =  AqwamTensorLibrary:minor(tensor, row, column)
 
 	local sign = (((row + column) % 2 == 0) and 1) or -1
+	
+	local determinant =AqwamTensorLibrary:determinant(minor)
+	
+	local cofactor = sign * determinant
 
-	return sign * AqwamTensorLibrary:determinant(minor)
+	return cofactor 
 
 end
 
@@ -1754,11 +1813,11 @@ function AqwamTensorLibrary:determinant(tensor)
 
 		local determinant = 0
 
-		for i = 1, dimensionSize do
+		for i = 1, dimensionSize, 1 do
 
-			local cofactor =  AqwamTensorLibrary:cofactor(tensor, 1, i)
+			local cofactor = AqwamTensorLibrary:cofactor(tensor, 1, i)
 
-			determinant = determinant + tensor[1][i] * cofactor
+			determinant = determinant + (tensor[1][i] * cofactor)
 
 		end
 
@@ -1768,57 +1827,221 @@ function AqwamTensorLibrary:determinant(tensor)
 
 end
 
-function AqwamTensorLibrary:inverse(tensor)
-
-	if (#tensor ~= #tensor[1]) then return nil end
-
+local function determinantInverse(tensor)
+	
 	local dimensionSize = #tensor
 
 	local determinant = AqwamTensorLibrary:determinant(tensor)
 
-	if (determinant == 0) then
+	if (determinant == 0) then return end -- tensor is not invertible
 
-		return nil -- tensor is not invertible
+	if (dimensionSize == 1) then return {{1 / determinant}} end
 
-	elseif (dimensionSize == 1) then
+	local adjugateTensor = {}
 
-		return {{1 / determinant}}
+	for i = 1, dimensionSize, 1 do
+		
+		local adjugateVector = {}
 
-	else
+		for j = 1, dimensionSize, 1 do
 
-		local adjugate = {}
+			local cofactor = AqwamTensorLibrary:cofactor(tensor, i, j)
 
-		for i = 1, dimensionSize do
-
-			adjugate[i] = {}
-
-			for j = 1, dimensionSize do
-
-				local sign = ((i + j) % 2 == 0) and 1 or -1
-
-				local cof = AqwamTensorLibrary:cofactor(tensor, i, j)
-
-				adjugate[i][j] = sign * cof
-
-			end
+			adjugateVector[j] = cofactor
 
 		end
-
-		local inverseTensor = AqwamTensorLibrary:transpose(adjugate)
-
-		for i = 1, dimensionSize do
-
-			for j = 1, dimensionSize do
-
-				inverseTensor[i][j] = inverseTensor[i][j] / determinant
-
-			end
-
-		end
-
-		return inverseTensor
+		
+		adjugateTensor[i] = adjugateVector
 
 	end
+
+	local inverseTensor = AqwamTensorLibrary:transpose(adjugateTensor)
+
+	for i = 1, dimensionSize, 1 do
+		
+		local inverseVector = inverseTensor[i]
+
+		for j = 1, dimensionSize, 1 do
+
+			inverseVector[j] = inverseVector[j] / determinant
+
+		end
+
+	end
+
+	return inverseTensor
+	
+end
+
+local function luDecompositionInverse(tensor)
+
+	local dimensionSize = #tensor
+
+	-- Create augmented tensor [A | I].
+	
+	local augmentedTensor = {}
+
+	for i = 1, dimensionSize, 1 do
+		
+		local augmentedVector = {}
+
+		-- Copy A tensor.
+		
+		for j = 1, dimensionSize, 1 do
+			
+			augmentedVector[j] = tensor[i][j]
+
+		end
+
+		-- Append identity I tensor.
+		
+		for j = 1, dimensionSize, 1 do
+
+			augmentedVector[dimensionSize + j] = (i == j) and 1 or 0
+
+		end
+		
+		augmentedTensor[i] = augmentedVector
+
+	end
+
+	-- Forward elimination with partial pivoting.
+	
+	for k = 1, dimensionSize, 1 do
+
+		-- 1. Find pivot.
+		
+		local maximumValue = math.abs(augmentedTensor[k][k])
+		
+		local maximumRowIndex = k
+
+		for i = k + 1, dimensionSize, 1 do
+
+			local value = math.abs(augmentedTensor[i][k])
+
+			if (value > maximumValue) then
+
+				maximumValue = value
+				
+				maximumRowIndex = i
+
+			end
+
+		end
+
+		if (maximumValue <= 0) then return end -- Tensor is singular or nearly singular.
+
+		-- 2. Swap Rows if needed.
+		
+		if (maximumRowIndex ~= k) then
+
+			local augmentedVector = augmentedTensor[k]
+			
+			augmentedTensor[k] = augmentedTensor[maximumRowIndex]
+			
+			augmentedTensor[maximumRowIndex] = augmentedVector
+
+		end
+
+		-- 3. Eliminate column.
+		
+		for i = k + 1, dimensionSize, 1 do
+
+			local factor = augmentedTensor[i][k] / augmentedTensor[k][k]
+			
+			local augmentedVector = augmentedTensor[i]
+
+			for j = k, (dimensionSize * 2), 1 do
+
+				augmentedVector[j] = augmentedVector[j] - (factor * augmentedTensor[k][j])
+
+			end
+
+		end
+
+	end
+
+	-- Backward substitution.
+	
+	for k = dimensionSize, 1, -1 do
+
+		-- Normalize pivot row.
+		
+		local pivot = augmentedTensor[k][k]
+		
+		local augmentedVector = augmentedTensor[k]
+
+		for j = k, (dimensionSize * 2), 1 do
+
+			augmentedVector[j] = augmentedVector[j] / pivot
+
+		end
+
+		-- Eliminate upwards.
+		
+		for i = k - 1, 1, -1 do
+
+			local factor = augmentedTensor[i][k]
+			
+			local augmentedVector = augmentedTensor[i]
+
+			for j = k, (dimensionSize * 2), 1 do
+
+				augmentedVector[j] = augmentedVector[j] - factor * augmentedTensor[k][j]
+
+			end
+
+		end
+
+	end
+
+	-- Extract resultTensor (Right half of augmented tensor).
+	
+	local inverseTensor = {}
+
+	for i = 1, dimensionSize, 1 do
+		
+		local inverseVector = {}
+
+		for j = 1, dimensionSize, 1 do
+
+			inverseVector[j] = augmentedTensor[i][dimensionSize + j]
+
+		end
+		
+		inverseTensor[i] = inverseVector
+
+	end
+
+	return inverseTensor
+
+end
+
+function AqwamTensorLibrary:inverse(tensor, method)
+	
+	local numberOfRows = #tensor
+	
+	local numberOfColumns = #tensor[1]
+
+	if (numberOfRows ~= numberOfColumns) or (numberOfRows == 0) or (numberOfColumns == 0) then return end
+	
+	if (not method) then
+		
+		-- LU decomposition inverse has a time complexity of O(n^3). Determinant inverse has a time complexity of O(n!).
+		
+		-- When dimensionSize is 6, the time complexity for LU decomposition inverse is O(216). Meanwhile determinant inverse is O(720).
+		
+		local isDimensionSizeLargerOrEqualToSix = (numberOfRows >= 6)
+		
+		method = (isDimensionSizeLargerOrEqualToSix and "LUDecomposition") or "Determinant"
+		
+	end
+	
+	if (method == "Determinant") then return determinantInverse(tensor) end
+	
+	if (method == "LUDecomposition") then return luDecompositionInverse(tensor) end
+
+	error("Invalid method.")
 
 end
 
@@ -1920,21 +2143,19 @@ function AqwamTensorLibrary:flip(tensor, dimension)
 	
 	local resultTensor = {}
 	
-	local unwrappedResultVector
-	
 	if (dimension == 1) then
 		
 		for i = 1, numberOfRows, 1 do
 			
-			unwrappedResultVector = {}
+			local resultVector = {}
 			
 			for j = 1, numberOfColumns, 1 do
 				
-				unwrappedResultVector[j] = tensor[(numberOfRows - i) + 1][j]
+				resultVector[j] = tensor[(numberOfRows - i) + 1][j]
 				
 			end
 			
-			resultTensor[i] = unwrappedResultVector
+			resultTensor[i] = resultVector
 			
 		end
 		
@@ -1942,15 +2163,15 @@ function AqwamTensorLibrary:flip(tensor, dimension)
 		
 		for i = 1, numberOfRows, 1 do
 
-			unwrappedResultVector = {}
+			local resultVector = {}
 			
 			for j = 1, numberOfColumns, 1 do
 				
-				unwrappedResultVector[j] = tensor[i][(numberOfColumns - j) + 1]
+				resultVector[j] = tensor[i][(numberOfColumns - j) + 1]
 				
 			end
 			
-			resultTensor[i] = unwrappedResultVector
+			resultTensor[i] = resultVector
 
 		end
 		
@@ -2048,7 +2269,7 @@ function AqwamTensorLibrary:createUpperTriangularTensor(dimensionSizeArray, diag
 
 	local resultTensor = {}
 
-	local unwrappedResultTensor
+	local resultVector
 
 	diagonalValue = diagonalValue or 1
 
@@ -2056,15 +2277,15 @@ function AqwamTensorLibrary:createUpperTriangularTensor(dimensionSizeArray, diag
 
 	for i = 1, numberOfRows, 1 do
 
-		unwrappedResultTensor = table.create(numberOfColumns, 0)
+		resultVector = table.create(numberOfColumns, 0)
 
 		for j = i, numberOfColumns, 1 do 
 
-			unwrappedResultTensor[j] = ((j == i) and diagonalValue) or offDiagonalValue
+			resultVector[j] = ((j == i) and diagonalValue) or offDiagonalValue
 
 		end
 
-		resultTensor[i] = unwrappedResultTensor
+		resultTensor[i] = resultVector
 
 	end
 
@@ -2080,7 +2301,7 @@ function AqwamTensorLibrary:createLowerTriangularTensor(dimensionSizeArray, diag
 	
 	local resultTensor = {}
 	
-	local unwrappedResultTensor
+	local resultVector
 	
 	diagonalValue = diagonalValue or 1
 	
@@ -2088,15 +2309,15 @@ function AqwamTensorLibrary:createLowerTriangularTensor(dimensionSizeArray, diag
 	
 	for i = 1, numberOfRows, 1 do
 		
-		unwrappedResultTensor = table.create(numberOfColumns, 0)
+		resultVector = table.create(numberOfColumns, 0)
 		
 		for j = 1, i, 1 do 
 			
-			unwrappedResultTensor[j] = ((j == i) and diagonalValue) or offDiagonalValue
+			resultVector[j] = ((j == i) and diagonalValue) or offDiagonalValue
 			
 		end
 		
-		resultTensor[i] = unwrappedResultTensor
+		resultTensor[i] = resultVector
 		
 	end
 	
@@ -2116,17 +2337,15 @@ function AqwamTensorLibrary:convertToDiagonalTensor(tensor)
 	
 	local resultTensor = {}
 	
-	local unwrappedResultTensor
-	
 	if (numberOfRows == 1) then
 		
 		for i = 1, numberOfColumns, 1 do
 			
-			unwrappedResultTensor = table.create(numberOfColumns, 0)
+			local resultVector = table.create(numberOfColumns, 0)
 			
-			unwrappedResultTensor[i] = tensor[1][i]
+			resultVector[i] = tensor[1][i]
 			
-			resultTensor[i] = unwrappedResultTensor
+			resultTensor[i] = resultVector
 			
 		end
 		
@@ -2134,11 +2353,11 @@ function AqwamTensorLibrary:convertToDiagonalTensor(tensor)
 		
 		for i = 1, numberOfRows, 1 do
 
-			unwrappedResultTensor = table.create(numberOfRows, 0)
+			local resultVector = table.create(numberOfRows, 0)
 
-			unwrappedResultTensor[i] = tensor[i][1]
+			resultVector[i] = tensor[i][1]
 
-			resultTensor[i] = unwrappedResultTensor
+			resultTensor[i] = resultVector
 
 		end
 		
