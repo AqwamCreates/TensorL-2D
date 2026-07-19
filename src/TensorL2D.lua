@@ -1669,7 +1669,7 @@ end
 
 function AqwamTensorLibrary:extractRows(tensor, startingRowIndex, endingRowIndex)
 
-	if (endingRowIndex == nil) then endingRowIndex = #tensor end
+	if (not endingRowIndex) then endingRowIndex = #tensor end
 
 	if (startingRowIndex <= 0) then error("The starting row index must be greater than 0.") end 
 
@@ -1929,7 +1929,7 @@ local function luDecompositionInverse(tensor)
 
 		end
 
-		if (maximumValue <= 0) then return end -- Tensor is singular or nearly singular.
+		if (maximumValue <= 0) then return end -- Tensor is singular.
 
 		-- 2. Swap Rows if needed.
 		
@@ -1995,7 +1995,7 @@ local function luDecompositionInverse(tensor)
 
 	end
 
-	-- Extract resultTensor (Right half of augmented tensor).
+	-- Extract resultTensor (right half of augmented tensor).
 	
 	local inverseTensor = {}
 
@@ -2029,7 +2029,7 @@ function AqwamTensorLibrary:inverse(tensor, method)
 		
 		-- LU decomposition inverse has a time complexity of O(n^3). Determinant inverse has a time complexity of O(n!).
 		
-		-- When dimensionSize is 6, the time complexity for LU decomposition inverse is O(216). Meanwhile determinant inverse is O(720).
+		-- When dimensionSize is 6, the time complexity for the LU decomposition inverse is O(216). Meanwhile the determinant inverse is O(720).
 		
 		local isDimensionSizeLargerOrEqualToSix = (numberOfRows >= 6)
 		
@@ -2072,10 +2072,14 @@ function AqwamTensorLibrary:isTensor(tensor)
 end
 
 function AqwamTensorLibrary:findNanValue(tensor)
+	
+	local numberOfRows = #tensor
 
-	for row = 1, #tensor, 1 do
+	local numberOfColumns = #tensor[1]
 
-		for column = 1, #tensor[1] do
+	for row = 1, numberOfRows, 1 do
+
+		for column = 1, numberOfColumns, 1 do
 
 			local value = tensor[row][column]
 
@@ -2090,10 +2094,14 @@ function AqwamTensorLibrary:findNanValue(tensor)
 end
 
 function AqwamTensorLibrary:findValue(tensor, valueToFind)
+	
+	local numberOfRows = #tensor
+	
+	local numberOfColumns = #tensor[1]
 
-	for row = 1, #tensor, 1 do
+	for row = 1, numberOfRows, 1 do
 
-		for column = 1, #tensor[1] do 
+		for column = 1, numberOfColumns, 1 do 
 
 			if (tensor[row][column] == valueToFind) then return {row, column} end
 
@@ -2208,14 +2216,6 @@ function AqwamTensorLibrary:sample(tensor, dimension)
 	newDimensionSizeArray[dimension] = 1
 
 	local randomProbabilityTensor = AqwamTensorLibrary:createRandomUniformTensor(newDimensionSizeArray, 0, 1)
-	
-	local randomProbabilityValue
-	
-	local unwrappedProbabilityVector
-	
-	local cumulativeProbabilityValue
-	
-	local index
 
 	local resultTensor = {}
 	
@@ -2229,13 +2229,13 @@ function AqwamTensorLibrary:sample(tensor, dimension)
 	
 	for i = 1, numberOfRows, 1 do
 
-		unwrappedProbabilityVector = probabilityTensor[i]
+		local unwrappedProbabilityVector = probabilityTensor[i]
 
-		randomProbabilityValue = randomProbabilityTensor[i][1]
+		local randomProbabilityValue = randomProbabilityTensor[i][1]
 
-		cumulativeProbabilityValue = 0
+		local cumulativeProbabilityValue = 0
 
-		index = nil
+		local index
 
 		for j = 1, numberOfColumns, 1 do
 
