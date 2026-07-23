@@ -1997,7 +1997,7 @@ local function luDecompositionInverse(tensor)
 
 			for j = k, (dimensionSize * 2), 1 do
 
-				augmentedVector[j] = augmentedVector[j] - factor * augmentedTensor[k][j]
+				augmentedVector[j] = augmentedVector[j] - (factor * augmentedTensor[k][j])
 
 			end
 
