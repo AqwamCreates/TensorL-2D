@@ -1919,7 +1919,7 @@ local function luDecompositionInverse(tensor)
 	
 	for k = 1, dimensionSize, 1 do
 
-		-- 1. Find pivot.
+		-- Find pivot.
 		
 		local maximumValue = math.abs(augmentedTensor[k][k])
 		
@@ -1941,7 +1941,7 @@ local function luDecompositionInverse(tensor)
 
 		if (maximumValue <= 0) then return end -- Tensor is singular.
 
-		-- 2. Swap Rows if needed.
+		-- Swap Rows if needed.
 		
 		if (maximumRowIndex ~= k) then
 
@@ -1953,7 +1953,7 @@ local function luDecompositionInverse(tensor)
 
 		end
 
-		-- 3. Eliminate columnIndex.
+		-- Eliminate columnIndex.
 		
 		for i = k + 1, dimensionSize, 1 do
 
