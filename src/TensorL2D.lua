@@ -1837,7 +1837,7 @@ function AqwamTensorLibrary:determinant(tensor)
 
 end
 
-local function determinantInverse(tensor)
+local function adjugateInverse(tensor)
 	
 	local dimensionSize = #tensor
 
@@ -2039,7 +2039,7 @@ function AqwamTensorLibrary:inverse(tensor, method)
 	
 	if (method == "LUDecomposition") then return luDecompositionInverse(tensor) end
 	
-	if (method == "Determinant") then return determinantInverse(tensor) end
+	if (method == "Adjugate") then return adjugateInverse(tensor) end
 
 	error("Invalid method.")
 
