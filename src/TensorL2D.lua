@@ -2035,21 +2035,11 @@ function AqwamTensorLibrary:inverse(tensor, method)
 
 	if (numberOfRows ~= numberOfColumns) or (numberOfRows == 0) or (numberOfColumns == 0) then return end
 	
-	if (not method) then
-		
-		-- LU decomposition inverse has a time complexity of O(n^3). Determinant inverse has a time complexity of O(n!).
-		
-		-- When dimensionSize is 6, the time complexity for the LU decomposition inverse is O(216). Meanwhile the determinant inverse is O(720).
-		
-		local isDimensionSizeLargerOrEqualToSix = (numberOfRows >= 6)
-		
-		method = (isDimensionSizeLargerOrEqualToSix and "LUDecomposition") or "Determinant"
-		
-	end
-	
-	if (method == "Determinant") then return determinantInverse(tensor) end
+	local method = method or "LUDecomposition"
 	
 	if (method == "LUDecomposition") then return luDecompositionInverse(tensor) end
+	
+	if (method == "Determinant") then return determinantInverse(tensor) end
 
 	error("Invalid method.")
 
