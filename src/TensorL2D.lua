@@ -1907,7 +1907,7 @@ local function luDecompositionInverse(tensor)
 		
 		for j = 1, dimensionSize, 1 do
 
-			augmentedVector[dimensionSize + j] = (i == j) and 1 or 0
+			augmentedVector[dimensionSize + j] = ((i == j) and 1) or 0
 
 		end
 		
